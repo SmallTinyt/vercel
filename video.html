@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmallTin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="icon" href="favicon.png" type="image/x-icon">
+    <style>
+        :root {
+            --bg-color: #050505;
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-hover-bg: rgba(255, 255, 255, 0.08);
+            --glow-color: rgba(99, 102, 241, 0.15); /* Indigo glow */
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: #ffffff;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        /* Ambient background blobs for the glass to refract */
+        .ambient-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.6;
+            z-index: 0;
+            animation: float 20s infinite ease-in-out alternate;
+        }
+
+        .blob-1 {
+            top: -10%;
+            left: -10%;
+            width: 500px;
+            height: 500px;
+            background: linear-gradient(to right, #4f46e5, #0ea5e9);
+        }
+
+        .blob-2 {
+            bottom: -20%;
+            right: -10%;
+            width: 600px;
+            height: 600px;
+            background: linear-gradient(to right, #9333ea, #db2777);
+            animation-delay: -5s;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+            100% { transform: translate(0, 0) scale(1); }
+        }
+
+        /* Liquid Glass Card Styling */
+        .glass-portal {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 10;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Shine effect inside the glass */
+        .glass-portal::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: skewX(-20deg);
+            transition: all 0.7s ease;
+        }
+
+        .glass-portal:hover {
+            transform: translateY(-8px) scale(1.02);
+            background: var(--glass-hover-bg);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6), 0 0 40px var(--glow-color);
+        }
+
+        .glass-portal:hover::before {
+            left: 200%;
+        }
+
+        /* Subtle glowing dot that follows the cursor */
+        #cursor-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, transparent 60%);
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+            transition: width 0.3s, height 0.3s;
+        }
+
+        /* Make sure interactive elements are above the glow */
+        .content-wrapper {
+            position: relative;
+            z-index: 10;
+        }
+
+        .middle {
+            align-items: center;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-slate-200 selection:bg-indigo-500 selection:text-white">
+    
+    <div id="cursor-glow"></div>
+    <div class="ambient-blob blob-1"></div>
+    <div class="ambient-blob blob-2"></div>
+
+    <div class="content-wrapper flex flex-col min-h-screen">
+        
+        <nav class="w-full px-6 py-5 md:px-12 flex justify-between items-center border-b border-white/5 bg-black/20 backdrop-blur-md sticky top-0 z-50">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" />
+                    </svg>
+                </div>
+                <h1 class="text-xl font-bold tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400">
+                    寂停國寂停市政府
+                </h1>
+            </div>
+            <div class="hidden md:flex gap-6 text-sm font-medium text-slate-400">
+                <a href="/" class="hover:text-white transition-colors">← 回到主頁</a>
+            </div>
+            <button class="md:hidden text-slate-300 hover:text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                </svg>
+            </button>
+        </nav>
+
+        <main class="w-full max-w-6xl mx-auto px-6 pb-32">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                <h1 class="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-500 mb-6 md:col-span-2 lg:col-span-3" style="font-size:120px;">
+                    《惡 意 剪 輯》
+                </h1>
+                <video src="evilhachimi1.mp4" alt="惡意剪輯" class="md:col-span-2 lg:col-span-3" controls></video>
+            </div>
+        </main>
+    </div>
+
+    <footer class="w-full px-6 py-5 md:px-12 flex justify-between items-center border-t border-white/5 bg-black/20 backdrop-blur-md middle">
+        <p class="text-sm text-slate-400">&copy; 2026 SmallTin.</p>
+    </footer>
+
+    <script>
+        // JavaScript to make the ambient glow follow the cursor
+        const cursorGlow = document.getElementById('cursor-glow');
+        
+        document.addEventListener('mousemove', (e) => {
+            // Update the position of the glow element to match cursor
+            cursorGlow.style.left = e.clientX + 'px';
+            cursorGlow.style.top = e.clientY + 'px';
+        });
+
+        // Add touch support for mobile devices
+        document.addEventListener('touchmove', (e) => {
+            if(e.touches.length > 0) {
+                cursorGlow.style.left = e.touches[0].clientX + 'px';
+                cursorGlow.style.top = e.touches[0].clientY + 'px';
+            }
+        });
+    </script>
+</body>
+</html>
