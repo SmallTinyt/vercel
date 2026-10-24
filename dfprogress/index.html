@@ -659,6 +659,11 @@
         font-size: 36px;
       }
     }
+
+    a:visited, a:link {
+      color: inherit;
+      text-decoration: none;
+    }
   </style>
 </head>
 <body>
@@ -683,126 +688,23 @@
     <!-- Main Progress Tracker: 純幣 1 億目標進度條 -->
     <section class="tactical-box progress-section">
       <div class="progress-top-info">
-        <div class="progress-label-wrap">
-          <h3>
-            純幣進度條
-          </h3>
-          <div class="progress-amount">
-            <div class="amount-current">
-              <span id="displayCash">0</span>
-              <span class="unit"></span>
-            </div>
-            <div class="amount-divider">/</div>
-            <div class="amount-target">100,000,000</div>
+        <a href="smalltin6767.html">
+          <div class="progress-label-wrap">
+            <h3>
+              SmallTin6767
+            </h3>
           </div>
-        </div>
-
-        <div class="progress-percent-wrap">
-          <div id="displayPercent" class="percent-number">0.00%</div>
-          <div class="percent-label">CASH COMPLETION RATE</div>
-        </div>
-      </div>
-
-      <!-- Cyber Bar Track -->
-      <div class="progress-track-wrapper">
-        <div class="progress-track">
-          <div id="progressFill" class="progress-fill"></div>
-        </div>
-        <div id="laserHead" class="laser-head" style="left: 0%;"></div>
-      </div>
-    </section>
-
-    <!-- Core Metrics Grid: 純幣、總資產、總局數、K/D 獨立分開 -->
-    <div class="stats-section-title">
-      詳細資訊
-    </div>
-
-    <div class="primary-stats-grid">
-      <!-- 1. 純幣儲備 (Pure Cash) -->
-      <div class="tactical-box stat-card featured">
-        <div class="stat-header">
-          <div class="stat-title">純幣儲備</div>
-          <div class="stat-icon">
-            <svg viewBox="0 0 24 24">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z"/>
-            </svg>
+        </a>
+        <br>
+        <a href="smalltinyt67.html">
+          <div class="progress-label-wrap">
+            <h3>
+              SmallTinyt67
+            </h3>
           </div>
-        </div>
-        <div id="cardCash" class="stat-main-value glow-green">$0</div>
-        <div class="stat-sub-info">
-          <span>距一億目標剩餘</span>
-          <span id="cardCashRemaining" class="value">100,000,000</span>
-        </div>
+        </a>
       </div>
-
-      <!-- 2. 總資產 (Total Net Worth: 純幣 + 倉庫裝備) -->
-      <div class="tactical-box stat-card">
-        <div class="stat-header">
-          <div class="stat-title">總資產</div>
-          <div class="stat-icon">
-            <svg viewBox="0 0 24 24">
-              <path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
-            </svg>
-          </div>
-        </div>
-        <div id="cardTotalAssets" class="stat-main-value">$0</div>
-        <div class="stat-sub-info">
-          <span>裝備物資估值</span>
-          <span id="cardInventoryValue" class="value">$0</span>
-        </div>
-      </div>
-
-      <!-- 3. 總作戰局數 (Total Raids / Matches) -->
-      <div class="tactical-box stat-card">
-        <div class="stat-header">
-          <div class="stat-title">總作戰局數 (TOTAL RAIDS)</div>
-          <div class="stat-icon">
-            <svg viewBox="0 0 24 24">
-              <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/>
-            </svg>
-          </div>
-        </div>
-        <div id="cardTotalMatches" class="stat-main-value">0</div>
-        <div class="stat-sub-info">
-          <span>成功撤離次數 / 率</span>
-          <span id="cardExtractions" class="value">0 次 (0%)</span>
-        </div>
-      </div>
-
-      <!-- 4. K/D 戰績 (Kill / Death Ratio) -->
-      <div class="tactical-box stat-card">
-        <div class="stat-header">
-          <div class="stat-title">特勤 K/D (KILL / DEATH)</div>
-          <div class="stat-icon">
-            <svg viewBox="0 0 24 24">
-              <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm1 14.93V18a1 1 0 0 1-2 0v-1.07A8 8 0 0 1 4.07 11H3a1 1 0 0 1 0-2h1.07A8 8 0 0 1 11 2.07V1a1 1 0 0 1 2 0v1.07A8 8 0 0 1 19.93 9H21a1 1 0 0 1 0 2h-1.07A8 8 0 0 1 13 16.93zM12 6a6 6 0 1 0 6 6 6 6 0 0 0-6-6z"/>
-            </svg>
-          </div>
-        </div>
-        <div id="cardKD" class="stat-main-value glow-green">0.00</div>
-        <div class="stat-sub-info">
-          <span>總淘汰 / 總陣亡</span>
-          <span id="cardKillsDeaths" class="value">0 殺 / 0 亡</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Secondary Telemetry Grid -->
-    <div class="secondary-stats-grid">
-      <div class="tactical-box sub-stat-card">
-        <div class="sub-stat-label">純幣佔總資產比 (CASH RATIO)</div>
-        <div id="subCashRatio" class="sub-stat-value highlight">0.0%</div>
-      </div>
-      <div class="tactical-box sub-stat-card">
-        <div class="sub-stat-label">每局平均純幣淨利 (AVG CASH)</div>
-        <div id="subAvgCash" class="sub-stat-value highlight">$0</div>
-      </div>
-      <div class="tactical-box sub-stat-card">
-        <div class="sub-stat-label">預估達成純幣剩餘局數</div>
-        <div id="subEstMatches" class="sub-stat-value">--</div>
-      </div>
-    </div>
-
+      
     <!-- Footer -->
     <footer class="footer">
       <div>DF_PROGRESS</div>
