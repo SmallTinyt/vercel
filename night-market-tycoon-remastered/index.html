@@ -267,10 +267,10 @@ body.mode-mg #hwHome,body.mode-cab #hwHome{display:none}
 <canvas id="c" tabindex="-1" data-engine="three.js r160" width="2548" height="1241"></canvas>
 
 <div id="topbar">
-  <div class="pill" id="coinPill"><div class="row"><span class="ic">🪙</span><span id="coins">6.248050231349851e+40垓</span></div><span id="rate">+1.292933950766677e+26垓 / 秒</span></div>
+  <div class="pill" id="coinPill"><div class="row"><span class="ic">🪙</span><span id="coins">0</span></div><span id="rate">+0 / 秒</span></div>
   <div class="pillcol">
-    <div class="pill small" id="repPill" title="口碑：讓客流增加"><span class="ic">⭐</span><span id="rep">8.35億</span></div>
-    <div class="pill small" id="famePill" title="招牌名氣：永久收入加成"><span class="ic">🏮</span><span id="fame">258474255973148</span></div>
+    <div class="pill small" id="repPill" title="口碑：讓客流增加"><span class="ic">⭐</span><span id="rep">0</span></div>
+    <div class="pill small" id="famePill" title="招牌名氣：永久收入加成"><span class="ic">🏮</span><span id="fame">0</span></div>
   </div>
   <div class="pill" id="clockPill"><span id="clock">00:02</span><span id="phase" class="">收攤後</span></div>
   <button class="iconbtn" id="btnMute" aria-label="靜音">🔊</button>
@@ -313,11 +313,11 @@ body.mode-mg #hwHome,body.mode-cab #hwHome{display:none}
 </div>
 
 <div id="toasts"><div class="toast hw">……街上安靜下來了。</div></div>
-<div id="modalWrap" class=""><div class="modal" id="modal"><h2>🏮 第 7 晚・今晚戰績</h2><div class="big">🪙 2.4234691193457376e+39垓</div>
-        <div class="list"><div class="kv"><span>服務客人</span><b>3.11億 位</b></div>
-        <div class="kv"><span>最賺攤位</span><b>🐠 撈金魚（🪙2.0877743657079758e+39垓）</b></div>
-        <div class="kv"><span>目前口碑</span><b>⭐ 8.35億</b></div>
-        <div class="kv"><span>單晚最高</span><b>🪙 2.6233646938257167e+39垓</b></div></div><div class="btnrow" style="margin-top:12px;flex-wrap:wrap"><button class="btn green" data-i="0">收攤後……（0）</button></div></div></div>
+<div id="modalWrap" class=""><div class="modal" id="modal"><h2>🏮 第 1 晚・今晚戰績</h2><div class="big">🪙 0</div>
+        <div class="list"><div class="kv"><span>服務客人</span><b>0 位</b></div>
+        <div class="kv"><span>最賺攤位</span><b>🐠 撈金魚（🪙0）</b></div>
+        <div class="kv"><span>目前口碑</span><b>⭐ 0</b></div>
+        <div class="kv"><span>單晚最高</span><b>🪙 0</b></div></div><div class="btnrow" style="margin-top:12px;flex-wrap:wrap"><button class="btn green" data-i="0">收攤後……（0）</button></div></div></div>
 
 <noscript><div style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#140f33;color:#fff;z-index:200">請開啟 JavaScript 才能遊玩《夜市大亨》。</div></noscript>
 
@@ -367,6 +367,7 @@ const CONFIG = {
   },
   economy: {
     startCoins: 15,
+    startFame: 0,
     upgradeGrowth: 1.15,        // 升級費用每級 ×1.15
     pricePerLevel: 0.25,        // 售價每級 +25%
     speedPerLevel: 0.05,        // 產量每級 +5%
@@ -992,7 +993,7 @@ function newStallState() { return { lv: { speed: 0, price: 0, queue: 0, auto: 0 
 function newState() {
   const lots = Array(CONFIG.street.lotCount).fill(null); lots[0] = 'chicken';
   return {
-    v: CONFIG.saveVersion, coins: CONFIG.economy.startCoins, rep: 0, fame: 0, cityIndex: 0, prestigeCount: 0,
+    v: CONFIG.saveVersion, coins: CONFIG.economy.startCoins, rep: 0, fame: CONFIG.economy.startFame, cityIndex: 0, prestigeCount: 0,
     runEarnings: 0, totalEarnings: 0, lots, stalls: { chicken: newStallState() }, best: {},
     night: 1, clock: CONFIG.time.open, tonight: { revenue: 0, served: 0, by: {} },
     stats: { upgrades: 0, perfectCutlets: 0, threeStars: 0, streak: 0, maxStreak: 0, bestNight: 0, balloonsBest: 0, clawBest: 0, fishBest: 0, rainSeen: 0, influencers: 0, typhoons: 0, combosSeen: 0, maxCombos: 0, minigames: 0 },
