@@ -2222,7 +2222,7 @@ const CONFIG = {
     typhoonChance: 0.05, typhoonMinNight: 3, typhoonCompSeconds: 240,
   },
   prestige: { minEarnings: 1e12, famePerSqrt: 2, repToFame: 1 / 100 },
-  street: { lotCount: 11, lotSpacing: 5, stallZ: -4, walkZ: [2.4, 4.6], queueGap: 0.55, maxQueueVisible: 7, frontZ: 5.4 },
+  street: { lotCount: 16, lotSpacing: 5, stallZ: -4, walkZ: [2.4, 4.6], queueGap: 0.55, maxQueueVisible: 7, frontZ: 5.4 },
   crowd: { minCount: 8, speed: [0.9, 1.5] },
   camera: { fov: 40, minZoom: 0.6, maxZoom: 1.45, streetW: [7.5, 13.5], streetH: 8 },
   // 萬聖節限時彩蛋「凌晨三點的攤位」（只有 HalloweenEvent 會用到）
@@ -2275,6 +2275,16 @@ const STALL_DEFS = [
     slogan: '酸甜脆口', desc: '亮晶晶的糖衣草莓與番茄串。', colors: { awning: '#d62828', awning2: '#ffe5e5', sign: '#fcbf49', signText: '#9d0208', wall: '#fbe0e0', shirt: '#ffc9c9' } },
   { id: 'phone',    name: '手機保護殼',   sign: '手機保護殼', emoji: '📱', tags: ['game'],                unlockCost: 1e16,  basePrice: 1.2e13, baseSpeed: 0.8,  baseArrival: 1.0, baseQueue: 4, costBase: 5e10,  prop: 'phoneCharger', minigame: null,
     slogan: '防撞防摔', desc: '手機保護殼，快速又防摔！', colors: { awning: '#8338ec', awning2: '#f3e8ff', sign: '#3a0ca3', signText: '#ffffff', wall: '#e9e0f7', shirt: '#d9b3ff' } },
+  { id: 'takoyaki', name: '章魚燒',     sign: '章魚燒',   emoji: '🐙', tags: ['hot', 'food', 'seafood'], unlockCost: 1.5e17, basePrice: 2e14,   baseSpeed: 0.65, baseArrival: 1.0, baseQueue: 4, costBase: 2e11,  prop: 'takoyakiPlate', minigame: null,
+    slogan: '柴魚跳舞', desc: '顆顆飽滿大章魚，淋滿特製醬汁與飛舞柴魚片！', colors: { awning: '#d90429', awning2: '#edf2f4', sign: '#2b2d42', signText: '#ef233c', wall: '#fceade', shirt: '#d90429' } },
+  { id: 'shavedice', name: '芒果冰',     sign: '芒果雪花冰', emoji: '🍧', tags: ['sweet', 'drink'],         unlockCost: 2.5e19, basePrice: 3.5e16, baseSpeed: 0.6,  baseArrival: 1.0, baseQueue: 4, costBase: 5e12,  prop: 'iceShaper', minigame: null,
+    slogan: '清涼消暑', desc: '滿滿現切愛文芒果，淋上濃郁煉乳與芒果冰淇淋！', colors: { awning: '#ffb703', awning2: '#fffbeb', sign: '#fb8500', signText: '#023047', wall: '#fff5d6', shirt: '#ffb703' } },
+  { id: 'squid',    name: '烤魷魚',     sign: '炭烤大魷魚', emoji: '🦑', tags: ['hot', 'food', 'seafood'], unlockCost: 4e21,   basePrice: 6e18,   baseSpeed: 0.55, baseArrival: 1.0, baseQueue: 4, costBase: 1e14,  prop: 'squidGrill', minigame: null,
+    slogan: '現烤醬香', desc: '整隻深海大魷魚，刷上特製沙茶醬炭烤噴香。', colors: { awning: '#9d0208', awning2: '#ffba08', sign: '#370617', signText: '#faa307', wall: '#f5d5cb', shirt: '#d00000' } },
+  { id: 'steak',    name: '鐵板牛排',   sign: '夜市厚切牛排', emoji: '🥩', tags: ['hot', 'food'],           unlockCost: 6.5e23, basePrice: 1.2e21, baseSpeed: 0.55, baseArrival: 1.0, baseQueue: 4, costBase: 3e15,  prop: 'steakSizzler', minigame: null,
+    slogan: '滋滋作響', desc: '厚切牛排滋滋作響，配半熟太陽蛋與鐵板油麵！', colors: { awning: '#590d22', awning2: '#ffccd5', sign: '#800f2f', signText: '#fff0f3', wall: '#ecd8db', shirt: '#c9184a' } },
+  { id: 'mahjong',  name: '麻將賓果',   sign: '摸麻將賓果', emoji: '🀄', tags: ['game'],                   unlockCost: 1e26,   basePrice: 2.5e23, baseSpeed: 0.5,  baseArrival: 1.0, baseQueue: 4, costBase: 8e16,  prop: 'mahjongTable', minigame: null,
+    slogan: '摸牌連線', desc: '摸牌連線樂趣多，連成一線超大娃娃直接帶走！', colors: { awning: '#007f5f', awning2: '#d8f3dc', sign: '#2d6a4f', signText: '#ffff3f', wall: '#e8f5e9', shirt: '#52b788' } },
 ];
 const DEF = Object.fromEntries(STALL_DEFS.map((d, i) => [d.id, { ...d, index: i }]));
 const TAG_NAMES = { hot: '熱食', fried: '炸物', food: '正餐', drink: '飲料', sweet: '甜食', game: '遊戲', seafood: '海鮮' };
@@ -2304,8 +2314,16 @@ const COMBO_DEFS = [
     desc: '雞排＋地瓜球＋臭豆腐：炸物攤產量 +25%', effect: { target: { tag: 'fried' }, speed: 0.25 } },
   { id: 'date',     name: '約會路線',     color: '#ff5d8f', type: 'adjacent', a: ['balloon'], b: ['tanghulu', 'milktea'],
     desc: '射氣球緊鄰糖葫蘆或珍奶：尖峰時段客流再 +30%', effect: { target: 'involved', peakArrival: 0.3 } },
+  { id: 'seafood_feast', name: '海味大賞', color: '#38b000', type: 'own', stalls: ['oyster', 'takoyaki', 'squid'],
+    desc: '蚵仔煎＋章魚燒＋烤魷魚：海鮮攤收入 +35%', effect: { target: { tag: 'seafood' }, income: 0.35 } },
+  { id: 'summer_cool', name: '盛夏涼品', color: '#00b4d8', type: 'own', stalls: ['milktea', 'shavedice'],
+    desc: '珍奶＋芒果雪花冰：甜食與飲料攤售價 +25%', effect: { target: { tag: 'sweet' }, price: 0.25 } },
+  { id: 'carnival', name: '夜市遊樂園', color: '#9d4edd', type: 'own', stalls: ['balloon', 'claw', 'goldfish', 'phone', 'mahjong'],
+    desc: '集滿五大遊戲攤：全遊戲攤客流 +35%', effect: { target: { tag: 'game' }, arrival: 0.35 } },
+  { id: 'steak_combo', name: '經典鐵板餐', color: '#ff758f', type: 'adjacent', a: ['steak'], b: ['milktea', 'shavedice'],
+    desc: '鐵板牛排緊鄰珍奶或芒果冰：相關攤位售價 +20%', effect: { target: 'involved', price: 0.2 } },
   { id: 'fullstreet', name: '夜市一條龍', color: '#5ad8ff', type: 'own', stalls: STALL_DEFS.map((d) => d.id),
-    desc: '集滿全部 10 種攤位：全攤收入 +50%', effect: { target: 'all', income: 0.5 } },
+    desc: '集滿全夜市全部攤位：全攤收入 +50%', effect: { target: 'all', income: 0.5 } },
 ];
 
 // 轉生城市（名稱皆為虛構）
@@ -2315,7 +2333,7 @@ const CITIES = [
   { id: 'mountain',  name: '雲霧山城夜市', theme: 'mountain', desc: '沿著階梯而上的山城老街。熱食攤收入 +40%', bonus: { tag: 'hot', income: 0.4 } },
 ];
 
-const INFLUENCERS = ['吃貨小美', '阿肥愛夜市', '夜貓子阿傑', '胖虎吃遍台灣', '小花美食日記', '台妹週末 Vlog', '粥粥吐司貓'];
+const INFLUENCERS = ['巫師貓', '哈基米', 'D-D小無名', '陳毅弘', '抖音跑刀的無名', '粥粥吐司貓'];
 
 const PRIZES = [
   { id: 'duck',   name: '黃色小鴨',   rarity: 1 },
@@ -2350,10 +2368,10 @@ const ACHIEVEMENTS = [
   { id: 'streak10',   icon: '🔥', name: '十連 3 星',      desc: '連續 10 局小遊戲拿到 3 星',    check: (s) => s.stats.maxStreak >= 10 },
   { id: 'typhoon',    icon: '🌀', name: '颱風夜',         desc: '經歷一次颱風停業',             check: (s) => s.stats.typhoons >= 1 },
   { id: 'collector',  icon: '🧸', name: '戰利品收藏家',   desc: '收集 5 種不同獎品',            check: (s) => Object.keys(s.trophies).length >= 5 },
-  { id: 'allstalls',  icon: '🏮', name: '集滿所有攤位',   desc: '擁有全部 10 種攤位',           check: (s) => Game.ownedCount() >= STALL_DEFS.length },
+  { id: 'allstalls',  icon: '🏮', name: '集滿所有攤位',   desc: '擁有全部 16 種攤位',           check: (s) => Game.ownedCount() >= STALL_DEFS.length },
   { id: 'night100m',  icon: '👑', name: '夜市傳奇',       desc: '單晚營業額達到 1 億',          check: (s) => s.stats.bestNight >= 1e8 },
   { id: 'prestige',   icon: '🌏', name: '夜市連鎖',       desc: '到別的城市開新夜市',           check: (s) => s.prestigeCount >= 1 },
-  { id: 'cheat',      icon: '💀', name: '你作弊了嗎？',   desc: '賺到 1,000,000,000,000 極',   check: (s) => s.totalEarnings >= 1e60 },
+  { id: 'cheat',      icon: '💀', name: '你作弊了嗎？',   desc: '賺到 1極 / 1 Qid / 1e48',   check: (s) => s.totalEarnings >= 1e48 },
 ];
 
 /* ==========================================================================
@@ -2384,7 +2402,7 @@ function fmt(n) {
     return `${s}e${exp}`;
   }
   if (mode === 'en') {
-    if (n < 1e9) return n.toLocaleString('en-US');
+    if (n < 1e3) return n.toLocaleString('en-US');
     const enUnits = [
       [1e93, ' Trigintillion'], [1e90, ' Novemvigintillion'], [1e87, ' Octovigintillion'], [1e84, ' Septenvigintillion'], [1e81, ' Sexvigintillion'],
       [1e78, ' Quinvigintillion'], [1e75, ' Quattuorvigintillion'], [1e72, ' Trevigintillion'], [1e69, ' Duovigintillion'], [1e66, ' Unvigintillion'],
@@ -2864,7 +2882,12 @@ function loadState() {
     s.tutorial = Object.assign(base.tutorial, sv.tutorial || {});
     s.tonight = Object.assign({ revenue: 0, served: 0, by: {} }, sv.tonight || {});
     s.best = sv.best || {}; s.trophies = sv.trophies || {}; s.achievements = sv.achievements || {};
-    if (!Array.isArray(s.lots) || s.lots.length !== CONFIG.street.lotCount) s.lots = base.lots;
+    if (!Array.isArray(s.lots)) s.lots = base.lots;
+    else if (s.lots.length < CONFIG.street.lotCount) {
+      s.lots = s.lots.concat(Array(CONFIG.street.lotCount - s.lots.length).fill(null));
+    } else if (s.lots.length > CONFIG.street.lotCount) {
+      s.lots = s.lots.slice(0, CONFIG.street.lotCount);
+    }
     s.lots = s.lots.map((id) => (DEF[id] ? id : null));
     s.stalls = s.stalls || {};
     for (const id of s.lots) if (id) { s.stalls[id] = Object.assign(newStallState(), s.stalls[id] || {}); s.stalls[id].lv = Object.assign(newStallState().lv, s.stalls[id].lv || {}); }
@@ -3296,8 +3319,130 @@ const PROPS = {
 
     return g;
   },
+  takoyakiPlate(d) {
+    const g = new THREE.Group();
+    g.add(box(1.7, 0.12, 0.52, mat('#2d2d33', { m: 0.6, r: 0.4 }), -0.15, 1.14, 1.0));
+    g.add(box(1.6, 0.02, 0.44, mat('#1a1a1f', { m: 0.7, r: 0.3 }), -0.15, 1.205, 1.0));
+    const ballMat = mat('#d9982e', { r: 0.5 });
+    const sauceMat = mat('#4a2810', { r: 0.3 });
+    const mayoMat = mat('#fff9e6', { r: 0.2 });
+    for (let r = 0; r < 2; r++) {
+      for (let c = 0; c < 8; c++) {
+        const x = -0.85 + c * 0.2, z = 0.88 + r * 0.22;
+        g.add(mesh(GEO.sphereLo, ballMat, x, 1.22, z, 0.08, 0.075, 0.08));
+        g.add(mesh(GEO.sphereLo, sauceMat, x, 1.27, z, 0.05, 0.025, 0.05));
+        g.add(box(0.06, 0.008, 0.02, mayoMat, x, 1.285, z));
+      }
+    }
+    for (let b = 0; b < 2; b++) {
+      const bx = 0.55 + b * 0.35;
+      g.add(box(0.28, 0.04, 0.16, mat('#deb887', { r: 0.8 }), bx, 1.13, 1.0));
+      for (let i = 0; i < 3; i++) g.add(mesh(GEO.sphereLo, ballMat, bx - 0.08 + i * 0.08, 1.16, 1.0, 0.04, 0.04, 0.04));
+      const stick = mesh(GEO.cylLo, mat('#e8d1a5'), bx + 0.02, 1.22, 1.0, 0.006, 0.14, 0.006);
+      stick.rotation.z = 0.3; g.add(stick);
+    }
+    return g;
+  },
+  iceShaper(d) {
+    const g = new THREE.Group();
+    const iron = mat('#0077b6', { m: 0.5, r: 0.4 }), chrome = mat('#e2e8f0', { m: 0.8, r: 0.2 });
+    g.add(box(0.42, 0.65, 0.42, iron, -0.85, 1.42, 0.95));
+    g.add(mesh(GEO.cyl, mat('#90e0ef', { op: 0.45 }), -0.85, 1.35, 0.95, 0.15, 0.22, 0.15));
+    const wheel = mesh(GEO.cylLo, chrome, -1.08, 1.62, 0.95, 0.16, 0.03, 0.16);
+    wheel.rotation.z = Math.PI / 2; g.add(wheel);
+    g.add(mesh(GEO.cylLo, mat('#ffd166'), -1.12, 1.72, 0.95, 0.02, 0.1, 0.02));
+    const mangoMat = mat('#ff9e00', { r: 0.3 }), iceMat = mat('#fff8e7', { r: 0.6 }), bowlMat = mat('#ffffff', { r: 0.2 });
+    for (const bx of [-0.2, 0.35]) {
+      g.add(mesh(geo('iceBowl', () => new THREE.CylinderGeometry(0.24, 0.14, 0.14, 16)), bowlMat, bx, 1.14, 1.0));
+      g.add(mesh(GEO.cone, iceMat, bx, 1.32, 1.0, 0.22, 0.26, 0.22));
+      for (let i = 0; i < 8; i++) {
+        const a = (i / 8) * Math.PI * 2;
+        g.add(box(0.065, 0.05, 0.065, mangoMat, bx + Math.cos(a) * 0.16, 1.23, 1.0 + Math.sin(a) * 0.16));
+      }
+      g.add(mesh(GEO.sphereLo, mat('#ffb703'), bx, 1.44, 1.0, 0.07));
+    }
+    g.add(box(0.45, 0.1, 0.35, mat('#e2e8f0', { op: 0.6 }), 0.88, 1.13, 1.0));
+    for (let i = 0; i < 4; i++) g.add(mesh(GEO.sphereLo, mangoMat, 0.76 + (i % 2) * 0.16, 1.18, 0.92 + Math.floor(i / 2) * 0.16, 0.07, 0.05, 0.06));
+    g.add(mesh(GEO.cyl, mat('#f8f9fa'), 1.25, 1.22, 1.0, 0.06, 0.22, 0.06));
+    return g;
+  },
+  squidGrill(d) {
+    const g = new THREE.Group();
+    g.add(box(1.8, 0.16, 0.5, mat('#343a40', { m: 0.6, r: 0.4 }), -0.15, 1.15, 1.0));
+    g.add(box(1.7, 0.02, 0.42, mat('#ff4500', { e: '#ff2200', ei: 0.8 }), -0.15, 1.225, 1.0));
+    for (let i = 0; i < 9; i++) g.add(box(1.72, 0.012, 0.012, mat('#adb5bd', { m: 0.8 }), -0.15, 1.245, 0.82 + i * 0.045));
+    const squidMat = mat('#9d0208', { r: 0.4 }), glazeMat = mat('#5a0004', { r: 0.2 }), stickMat = mat('#d4a373');
+    for (let i = 0; i < 4; i++) {
+      const x = -0.7 + i * 0.38;
+      const stick = mesh(GEO.cylLo, stickMat, x, 1.28, 1.0, 0.008, 0.62, 0.008); stick.rotation.x = Math.PI / 2; g.add(stick);
+      const head = mesh(GEO.cone, squidMat, x, 1.28, 0.82, 0.12, 0.18, 0.03); head.rotation.x = -Math.PI / 2; g.add(head);
+      g.add(box(0.18, 0.035, 0.22, squidMat, x, 1.28, 1.0));
+      g.add(box(0.19, 0.038, 0.03, glazeMat, x, 1.28, 0.95));
+      g.add(box(0.19, 0.038, 0.03, glazeMat, x, 1.28, 1.05));
+      for (let t = 0; t < 3; t++) {
+        const tentacle = mesh(GEO.cylLo, squidMat, x - 0.05 + t * 0.05, 1.28, 1.18, 0.015, 0.12, 0.015);
+        tentacle.rotation.x = Math.PI / 2 + 0.15 * (t - 1); g.add(tentacle);
+      }
+    }
+    g.add(mesh(GEO.cyl, mat('#adb5bd', { m: 0.6 }), 0.88, 1.24, 1.0, 0.12, 0.22, 0.12));
+    g.add(mesh(GEO.cyl, mat('#4a2810'), 0.88, 1.33, 1.0, 0.11, 0.03, 0.11));
+    const brush = mesh(GEO.cylLo, stickMat, 0.95, 1.38, 1.0, 0.01, 0.25, 0.01); brush.rotation.z = -0.3; g.add(brush);
+    return g;
+  },
+  steakSizzler(d) {
+    const g = new THREE.Group();
+    g.add(box(1.8, 0.1, 0.5, mat('#343a40', { m: 0.4 }), -0.15, 1.13, 1.0));
+    const woodPlate = mat('#7f4f24', { r: 0.8 }), ironPan = mat('#1a1a1a', { m: 0.7, r: 0.4 }), steakMeat = mat('#4a2211', { r: 0.5 });
+    const sauceMat = mat('#28140c', { r: 0.2 }), eggWhite = mat('#ffffff', { r: 0.3 }), eggYolk = mat('#f77f00', { r: 0.2 }), noodleMat = mat('#ffd166', { r: 0.4 });
+    for (const sx of [-0.6, 0.1]) {
+      g.add(box(0.52, 0.04, 0.38, woodPlate, sx, 1.14, 1.0));
+      g.add(box(0.46, 0.03, 0.32, ironPan, sx, 1.17, 1.0));
+      g.add(box(0.24, 0.04, 0.18, steakMeat, sx - 0.08, 1.205, 1.0));
+      g.add(box(0.22, 0.01, 0.16, sauceMat, sx - 0.08, 1.23, 1.0));
+      g.add(mesh(GEO.cyl, eggWhite, sx + 0.12, 1.2, 0.93, 0.07, 0.015, 0.07));
+      g.add(mesh(GEO.sphereLo, eggYolk, sx + 0.12, 1.215, 0.93, 0.035, 0.02, 0.035));
+      for (let n = 0; n < 3; n++) {
+        const noodle = box(0.12, 0.02, 0.03, noodleMat, sx + 0.11, 1.2 + n * 0.015, 1.06);
+        noodle.rotation.y = (n - 1) * 0.2; g.add(noodle);
+      }
+    }
+    g.add(mesh(GEO.cyl, mat('#e63946'), 0.58, 1.25, 1.0, 0.045, 0.22, 0.045));
+    g.add(mesh(GEO.cyl, mat('#2b2d42'), 0.7, 1.24, 1.0, 0.045, 0.2, 0.045));
+    g.add(mesh(GEO.cyl, mat('#cfd6de', { m: 0.7, r: 0.25 }), 0.95, 1.3, 0.95, 0.18, 0.38, 0.18));
+    g.add(mesh(GEO.cyl, mat('#ffb703'), 0.95, 1.48, 0.95, 0.03, 0.08, 0.03));
+    return g;
+  },
+  mahjongTable(d) {
+    const g = new THREE.Group();
+    g.add(box(1.85, 0.08, 0.52, mat('#1b4332', { r: 0.9 }), -0.15, 1.13, 1.0));
+    g.add(box(1.9, 0.1, 0.04, mat('#7f4f24'), -0.15, 1.14, 0.74));
+    g.add(box(1.9, 0.1, 0.04, mat('#7f4f24'), -0.15, 1.14, 1.26));
+    g.add(box(0.04, 0.1, 0.52, mat('#7f4f24'), -1.1, 1.14, 1.0));
+    g.add(box(0.04, 0.1, 0.52, mat('#7f4f24'), 0.8, 1.14, 1.0));
+    const tileWhite = mat('#f8f9fa', { r: 0.3 }), tileGreen = mat('#2d6a4f', { r: 0.4 });
+    const dotRed = mat('#d90429'), dotBlue = mat('#0077b6');
+    for (let r = 0; r < 4; r++) {
+      for (let c = 0; c < 8; c++) {
+        const x = -0.85 + c * 0.13, z = 0.85 + r * 0.11;
+        g.add(box(0.08, 0.04, 0.065, tileWhite, x, 1.18, z));
+        g.add(box(0.08, 0.008, 0.065, tileGreen, x, 1.16, z));
+        g.add(mesh(GEO.sphereLo, (r + c) % 2 ? dotRed : dotBlue, x, 1.205, z, 0.015, 0.005, 0.015));
+      }
+    }
+    g.add(box(1.3, 0.03, 0.04, mat('#deb887'), -0.25, 1.19, 1.2));
+    g.add(box(1.6, 0.55, 0.08, mat('#403d39'), -0.15, 1.55, 0.72));
+    const prizeColors = ['#ff006e', '#8338ec', '#3a86ff', '#fb5607'];
+    for (let i = 0; i < 4; i++) {
+      const px = -0.7 + i * 0.38;
+      g.add(mesh(GEO.sphereLo, mat(prizeColors[i]), px, 1.48, 0.76, 0.1, 0.1, 0.1));
+      g.add(mesh(GEO.sphereLo, mat(prizeColors[i]), px, 1.62, 0.76, 0.07, 0.07, 0.07));
+      g.add(mesh(GEO.sphereLo, mat('#ffffff'), px - 0.05, 1.69, 0.76, 0.025));
+      g.add(mesh(GEO.sphereLo, mat('#ffffff'), px + 0.05, 1.69, 0.76, 0.025));
+    }
+    return g;
+  },
 };
-const PROP_STEAM = { fryer: [-0.75, 1.35, 1.0], griddle: [-0.2, 1.2, 1.0], grill: [-0.1, 1.32, 1.0] };
+const PROP_STEAM = { fryer: [-0.75, 1.35, 1.0], griddle: [-0.2, 1.2, 1.0], grill: [-0.1, 1.32, 1.0], takoyakiPlate: [-0.15, 1.25, 1.0], squidGrill: [-0.15, 1.3, 1.0], steakSizzler: [-0.25, 1.25, 1.0] };
 
 const World = {
   renderer: null, scene: null, camera: null, composer: null, bloom: null, quality: 'mid', q: QUALITY.mid,
