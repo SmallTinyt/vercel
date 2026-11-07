@@ -2424,6 +2424,10 @@ function fmt(n) {
   if (mode === 'en') {
     if (n < 1e3) return n.toLocaleString('en-US');
     const enUnits = [
+      [1e153, ' Quinquagintillion'], [1e150, ' Novemquadragintillion'], [1e147, ' Octoquadragintillion'], [1e144, ' Septenquadragintillion'], [1e141, ' Sexquadragintillion'],
+      [1e138, ' Quinquadragintillion'], [1e135, ' Quattuorquadragintillion'], [1e132, ' Trequadragintillion'], [1e129, ' Duoquadragintillion'], [1e126, ' Unquadragintillion'],
+      [1e123, ' Quadragintillion'], [1e120, ' Novemtrigintillion'], [1e117, ' Octotrigintillion'], [1e114, ' Septentrigintillion'], [1e111, ' Sextrigintillion'],
+      [1e108, ' Quintrigintillion'], [1e105, ' Quattuortrigintillion'], [1e102, ' Tretrigintillion'], [1e99,  ' Duotrigintillion'], [1e96,  ' Untrigintillion'],
       [1e93, ' Trigintillion'], [1e90, ' Novemvigintillion'], [1e87, ' Octovigintillion'], [1e84, ' Septenvigintillion'], [1e81, ' Sexvigintillion'],
       [1e78, ' Quinvigintillion'], [1e75, ' Quattuorvigintillion'], [1e72, ' Trevigintillion'], [1e69, ' Duovigintillion'], [1e66, ' Unvigintillion'],
       [1e63, ' Vigintillion'], [1e60, ' Novemdecillion'], [1e57, ' Octodecillion'], [1e54, ' Septendecillion'], [1e51, ' Sexdecillion'],
@@ -2440,8 +2444,31 @@ function fmt(n) {
     }
     return n.toLocaleString('en-US');
   }
+  if (mode === 'en-short') {
+    if (n < 1e3) return n.toLocaleString('en-US');
+    const shortUnits = [
+      [1e153,   'Qig'], [1e150, 'NoQag'], [1e147, 'OcQag'], [1e144, 'SpQag'], [1e141, 'SxQag'],
+      [1e138, 'QiQag'], [1e135, 'QaQag'], [1e132,  'Tqag'], [1e129,  'Dqag'], [1e126,  'Uqag'],
+      [1e123,   'Qag'], [1e120,  'NoTg'], [1e117,  'OcTg'], [1e114,  'SpTg'], [1e111,  'SxTg'],
+      [1e108,  'QiTg'], [1e105,  'QaTg'], [1e102,   'Ttg'], [1e99,    'Dtg'], [1e96,    'Utg'],
+      [1e93,     'Tg'], [1e90,   'NoVg'], [1e87,   'OcVg'], [1e84,   'SpVg'], [1e81,   'SxVg'],
+      [1e78,   'QiVg'], [1e75,   'QaVg'], [1e72,    'Tvg'], [1e69,    'Dvg'], [1e66,    'Uvg'],
+      [1e63,     'Vg'], [1e60,    'Nod'], [1e57,    'Ocd'], [1e54,    'Spd'], [1e51,    'Sxd'],
+      [1e48,    'Qid'], [1e45,    'Qad'], [1e42,     'Td'], [1e39,     'Dd'], [1e36,     'Ud'],
+      [1e33,     'Dc'], [1e30,     'No'], [1e27,     'Oc'], [1e24,     'Sp'], [1e21,     'Sx'],
+      [1e18,     'Qi'], [1e15,     'Qa'], [1e12,      'T'], [1e9,       'B']
+    ];
+    for (const [v, u] of shortUnits) {
+      if (n >= v) {
+        const x = n / v;
+        const s = x >= 100 ? x.toFixed(0) : x >= 10 ? x.toFixed(1) : x.toFixed(2);
+        return s.replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '') + u;
+      }
+    }
+    return n.toLocaleString('en-US');
+  }
   if (n < 1e4) return n.toLocaleString('en-US');
-  const units = [[1e48, '極'], [1e44, '載'], [1e40, '正'], [1e36, '澗'], [1e32, '溝'], [1e28, '壤'], [1e24, '秭'], [1e20, '垓'], [1e16, '京'], [1e12, '兆'], [1e8, '億'], [1e4, '萬']];
+  const units = [[1e72, '大數'], [1e68, '無量'], [1e64, '不可思議'], [1e60, '那由他'], [1e56, '阿僧祇'], [1e52, '恆河沙'], [1e48, '極'], [1e44, '載'], [1e40, '正'], [1e36, '澗'], [1e32, '溝'], [1e28, '壤'], [1e24, '秭'], [1e20, '垓'], [1e16, '京'], [1e12, '兆'], [1e8, '億'], [1e4, '萬']];
   for (const [v, u] of units) {
     if (n >= v) {
       const x = n / v;
@@ -8069,7 +8096,7 @@ const UI = {
     this.modal({
       title: '⚙️ 設定',
       html: `<p class="muted">${CITIES[s.cityIndex].name}・第 ${s.night} 晚・累積賺進 <span id="menuTotal">🪙 ${fmt(s.totalEarnings)}</span></p>
-        <p style="text-align:left;margin:10px 0 4px">單位表示法</p><div class="qbtns"><button data-not="zh" class="${(s.notation || 'zh') === 'zh' ? 'on' : ''}">中文</button><button data-not="en" class="${s.notation === 'en' ? 'on' : ''}">英文</button><button data-not="sci" class="${s.notation === 'sci' ? 'on' : ''}">科學記號</button></div>
+        <p style="text-align:left;margin:10px 0 4px">單位表示法</p><div class="qbtns"><button data-not="zh" class="${(s.notation || 'zh') === 'zh' ? 'on' : ''}">中文</button><button data-not="en" class="${s.notation === 'en' ? 'on' : ''}">英文</button><button data-not="en-short" class="${s.notation === 'en-short' ? 'on' : ''}">英文簡寫</button><button data-not="sci" class="${s.notation === 'sci' ? 'on' : ''}">科學記號</button></div>
         <p style="text-align:left;margin:10px 0 4px">畫質</p><div class="qbtns">${Object.entries(QUALITY).map(([k, v]) => `<button data-q="${k}" class="${k === World.quality ? 'on' : ''}">${v.label}</button>`).join('')}</div>
         <p style="text-align:left;margin:10px 0 4px">音效</p><div class="qbtns"><button data-s="on" class="${s.muted ? '' : 'on'}">🔊 開</button><button data-s="off" class="${s.muted ? 'on' : ''}">🔇 關</button></div>
         <p class="muted" style="font-size:12px">進度每 ${CONFIG.autosaveSeconds} 秒自動存檔，關閉頁面時也會存。</p>
