@@ -7837,7 +7837,7 @@ const UI = {
       <div class="statgrid"><div><small>收入</small><b id="pInc">0</b></div><div><small>客流／出餐</small><b id="pFlow">0</b></div><div><small>排隊</small><b id="pQ">0</b></div></div>
       ${MG.canPlay(id) ? `<button class="btn pink" id="btnPlay" style="margin:0 0 10px">🎮 親自顧攤${best ? `<small style="font-size:12px;opacity:.85">（最高 ${best} 分）</small>` : ''}</button>` : `<button class="btn gray" disabled style="margin:0 0 10px">🎮 小遊戲準備中…（自動營業中）</button>`}
       <div id="pNotes"></div>
-      <div class="buymode"><span>購買數量</span><div class="seg" id="pSeg">${[1, 10, 'max'].map((m) => `<button data-m="${m}" class="${String(this.buyMode) === String(m) ? 'on' : ''}">${m === 'max' ? '最大' : '×' + m}</button>`).join('')}</div></div>
+      <div class="buymode"><span>購買數量</span><div class="seg" id="pSeg">${[1, 10, 100, 'max'].map((m) => `<button data-m="${m}" class="${String(this.buyMode) === String(m) ? 'on' : ''}">${m === 'max' ? '最大' : '×' + m}</button>`).join('')}</div></div>
       ${UPGRADES.map((u) => `<div class="upg" data-u="${u.id}"><div class="ui">${u.icon}</div><div class="ut"><b>${u.name} <span class="muted" data-lv></span></b><small data-desc></small></div><button class="ub" data-buy="${u.id}"><span data-cost></span><small data-n></small></button></div>`).join('')}
       <div class="combo-mini" id="pCombos"></div>`;
     body.querySelectorAll('#pSeg button').forEach((b) => (b.onclick = () => {
