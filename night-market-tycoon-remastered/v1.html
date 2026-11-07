@@ -2447,6 +2447,16 @@ function fmt(n) {
   if (mode === 'en-short') {
     if (n < 1e3) return n.toLocaleString('en-US');
     const shortUnits = [
+      [1e303,    'Ce'], [1e300, 'NoNog'], [1e297, 'OcNog'], [1e294, 'SpNog'], [1e291, 'SxNog'],
+      [1e288, 'QiNog'], [1e285, 'QaNog'], [1e282,  'Tnog'], [1e279,  'Dnog'], [1e276,  'Unog'],
+      [1e273,   'Nog'], [1e270, 'NoOcg'], [1e267, 'OcOcg'], [1e264, 'SpOcg'], [1e261, 'SxOcg'],
+      [1e258, 'QiOcg'], [1e255, 'QaOcg'], [1e252,  'Tocg'], [1e249,  'Docg'], [1e246,  'Uocg'],
+      [1e243,   'Ocg'], [1e240, 'NoSpg'], [1e237, 'OcSpg'], [1e234, 'SpSpg'], [1e231, 'SxSpg'],
+      [1e228, 'QiSpg'], [1e225, 'QaSpg'], [1e222,  'Tspg'], [1e219,  'Dspg'], [1e216,  'Uspg'],
+      [1e213,   'Spg'], [1e210, 'NoSxg'], [1e207, 'OcSxg'], [1e204, 'SpSxg'], [1e201, 'SxSxg'],
+      [1e198, 'QiSxg'], [1e195, 'QaSxg'], [1e192,  'Tsxg'], [1e189,  'Dsxg'], [1e186,  'Usxg'],
+      [1e183,   'Sxg'], [1e180, 'NoQig'], [1e177, 'OcQig'], [1e174, 'SpQig'], [1e171, 'SxQig'],
+      [1e168, 'QiQig'], [1e165, 'QaQig'], [1e162,  'Tqig'], [1e159,  'Dqig'], [1e156,  'Uqig'],
       [1e153,   'Qig'], [1e150, 'NoQag'], [1e147, 'OcQag'], [1e144, 'SpQag'], [1e141, 'SxQag'],
       [1e138, 'QiQag'], [1e135, 'QaQag'], [1e132,  'Tqag'], [1e129,  'Dqag'], [1e126,  'Uqag'],
       [1e123,   'Qag'], [1e120,  'NoTg'], [1e117,  'OcTg'], [1e114,  'SpTg'], [1e111,  'SxTg'],
