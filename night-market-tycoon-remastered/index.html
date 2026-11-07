@@ -2375,6 +2375,33 @@ const isMobile = matchMedia('(pointer: coarse)').matches || /Android|iPhone|iPad
 function fmt(n) {
   if (!isFinite(n)) return '∞';
   n = Math.floor(Math.max(0, n));
+  const mode = Game?.s?.notation || 'zh';
+  if (mode === 'sci') {
+    if (n < 1e4) return n.toLocaleString('en-US');
+    const exp = Math.floor(Math.log10(n));
+    const mantissa = n / Math.pow(10, exp);
+    const s = mantissa.toFixed(2).replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '');
+    return `${s}e${exp}`;
+  }
+  if (mode === 'en') {
+    if (n < 1e9) return n.toLocaleString('en-US');
+    const enUnits = [
+      [1e93, ' Trigintillion'], [1e90, ' Novemvigintillion'], [1e87, ' Octovigintillion'], [1e84, ' Septenvigintillion'], [1e81, ' Sexvigintillion'],
+      [1e78, ' Quinvigintillion'], [1e75, ' Quattuorvigintillion'], [1e72, ' Trevigintillion'], [1e69, ' Duovigintillion'], [1e66, ' Unvigintillion'],
+      [1e63, ' Vigintillion'], [1e60, ' Novemdecillion'], [1e57, ' Octodecillion'], [1e54, ' Septendecillion'], [1e51, ' Sexdecillion'],
+      [1e48, ' Quindecillion'], [1e45, ' Quattuordecillion'], [1e42, ' Tredecillion'], [1e39, ' Duodecillion'], [1e36, ' Undecillion'],
+      [1e33, ' Decillion'], [1e30, ' Nonillion'], [1e27, ' Octillion'], [1e24, ' Septillion'], [1e21, ' Sextillion'],
+      [1e18, ' Quintillion'], [1e15, ' Quadrillion'], [1e12, 'Trillion'], [1e9, ' Billion']
+    ];
+    for (const [v, u] of enUnits) {
+      if (n >= v) {
+        const x = n / v;
+        const s = x >= 100 ? x.toFixed(0) : x >= 10 ? x.toFixed(1) : x.toFixed(2);
+        return s.replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '') + u;
+      }
+    }
+    return n.toLocaleString('en-US');
+  }
   if (n < 1e4) return n.toLocaleString('en-US');
   const units = [[1e48, '極'], [1e44, '載'], [1e40, '正'], [1e36, '澗'], [1e32, '溝'], [1e28, '壤'], [1e24, '秭'], [1e20, '垓'], [1e16, '京'], [1e12, '兆'], [1e8, '億'], [1e4, '萬']];
   for (const [v, u] of units) {
@@ -2384,6 +2411,7 @@ function fmt(n) {
       return s.replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '') + u;
     }
   }
+  return n.toLocaleString('en-US');
 }
 const fmtRate = (n) => (n < 10 ? (Math.round(n * 10) / 10).toString() : fmt(n));
 const fmtTime = (min) => `${String(Math.floor(min / 60) % 24).padStart(2, '0')}:${String(Math.floor(min % 60)).padStart(2, '0')}`;
@@ -2823,7 +2851,7 @@ function newState() {
     runEarnings: 0, totalEarnings: 0, lots, stalls: { chicken: newStallState() }, best: {},
     night: 1, clock: CONFIG.time.open, tonight: { revenue: 0, served: 0, by: {} },
     stats: { upgrades: 0, perfectCutlets: 0, threeStars: 0, streak: 0, maxStreak: 0, bestNight: 0, balloonsBest: 0, clawBest: 0, fishBest: 0, rainSeen: 0, influencers: 0, typhoons: 0, combosSeen: 0, maxCombos: 0, minigames: 0 },
-    achievements: {}, trophies: {}, newTrophy: false, muted: false, quality: null,
+    achievements: {}, trophies: {}, newTrophy: false, muted: false, quality: null, notation: 'zh',
     tutorial: { upgraded: false, built: false, played: false, welcomed: false }, lastSaved: Date.now(),
   };
 }
@@ -2841,7 +2869,7 @@ function loadState() {
     s.stalls = s.stalls || {};
     for (const id of s.lots) if (id) { s.stalls[id] = Object.assign(newStallState(), s.stalls[id] || {}); s.stalls[id].lv = Object.assign(newStallState().lv, s.stalls[id].lv || {}); }
     if (!s.lots.some(Boolean)) { s.lots[0] = 'chicken'; s.stalls.chicken = newStallState(); }
-    if (!CITIES[s.cityIndex]) s.cityIndex = 0;
+    if (!CITIES[s.cityIndex]) s.cityIndex = 0; s.notation = sv.notation || 'zh';
     for (const k of ['coins', 'rep', 'fame', 'runEarnings', 'totalEarnings', 'clock', 'night']) if (!isFinite(s[k])) s[k] = base[k];
     return { state: s, fresh: false };
   } catch (e) { return { state: base, fresh: true }; }
@@ -6160,7 +6188,8 @@ const UI = {
     const s = Game.s;
     this.modal({
       title: '⚙️ 設定',
-      html: `<p class="muted">${CITIES[s.cityIndex].name}・第 ${s.night} 晚・累積賺進 🪙 ${fmt(s.totalEarnings)}</p>
+      html: `<p class="muted">${CITIES[s.cityIndex].name}・第 ${s.night} 晚・累積賺進 <span id="menuTotal">🪙 ${fmt(s.totalEarnings)}</span></p>
+        <p style="text-align:left;margin:10px 0 4px">單位表示法</p><div class="qbtns"><button data-not="zh" class="${(s.notation || 'zh') === 'zh' ? 'on' : ''}">中文</button><button data-not="en" class="${s.notation === 'en' ? 'on' : ''}">英文</button><button data-not="sci" class="${s.notation === 'sci' ? 'on' : ''}">科學記號</button></div>
         <p style="text-align:left;margin:10px 0 4px">畫質</p><div class="qbtns">${Object.entries(QUALITY).map(([k, v]) => `<button data-q="${k}" class="${k === World.quality ? 'on' : ''}">${v.label}</button>`).join('')}</div>
         <p style="text-align:left;margin:10px 0 4px">音效</p><div class="qbtns"><button data-s="on" class="${s.muted ? '' : 'on'}">🔊 開</button><button data-s="off" class="${s.muted ? 'on' : ''}">🔇 關</button></div>
         <p class="muted" style="font-size:12px">進度每 ${CONFIG.autosaveSeconds} 秒自動存檔，關閉頁面時也會存。</p>
@@ -6169,6 +6198,15 @@ const UI = {
         <p class="muted" style="font-size:11px">部分 3D 模型：Kenney（kenney.nl）、Quaternius（quaternius.com），CC0 授權</p>`,
       buttons: [{ label: '關閉' }],
       onShow: (m) => {
+        m.querySelectorAll('[data-not]').forEach((b) => (b.onclick = () => {
+          s.notation = b.dataset.not;
+          m.querySelectorAll('[data-not]').forEach((x) => x.classList.toggle('on', x === b));
+          const earned = m.querySelector('#menuTotal');
+          if (earned) earned.textContent = `🪙 ${fmt(s.totalEarnings)}`;
+          UI.updateTop();
+          if (UI.panelLot >= 0) UI.refreshPanel();
+          Save.write();
+        }));
         m.querySelectorAll('[data-q]').forEach((b) => (b.onclick = () => { World.applyQuality(b.dataset.q); s.quality = b.dataset.q; m.querySelectorAll('[data-q]').forEach((x) => x.classList.toggle('on', x === b)); Save.write(); }));
         m.querySelectorAll('[data-s]').forEach((b) => (b.onclick = () => { s.muted = b.dataset.s === 'off'; Sfx.setMuted(s.muted); this.syncMute(); m.querySelectorAll('[data-s]').forEach((x) => x.classList.toggle('on', x === b)); }));
         m.querySelector('#btnReset').onclick = () => { this.closeModal(); this.confirmReset(); };
