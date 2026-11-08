@@ -2594,7 +2594,7 @@ function fmt(n) {
   }
   if (mode === 'en-short') {
     if (d.lt(1e3)) return d.toNumber().toLocaleString('en-US');
-    if (d.e >= 366) {
+    if (d.e >= 456) {
       const s = d.m.toFixed(2).replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '');
       return `${s}e${d.e}`;
     }
