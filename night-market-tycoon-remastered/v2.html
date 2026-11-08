@@ -18,6 +18,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com/">
 <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
 <style>
+
 /* Inlined style.css */
 @font-face {
   font-family: 'Huninn';
@@ -2196,7 +2197,7 @@ const CONFIG = {
     startFame: 0,
     upgradeGrowth: 1.15,        // 升級費用每級 ×1.15
     pricePerLevel: 0.25,        // 售價每級 +25%
-    speedPerLevel: 0.05,        // 產量每級 +5%
+    speedPerLevel: 0.01,        // 產量每級 +1%
     queueArrivalPerLevel: 0.2, // 排隊上限每級 客流 +20%
     queueSlotsPerLevel: 1,      // 排隊上限每級 +1 人
     autoSpeedPerLevel: 0.15,    // 自動化每級 產量 +15%
@@ -8310,7 +8311,7 @@ const UI = {
     this.modal({
       title: '⚙️ 設定',
       html: `<p class="muted">${CITIES[s.cityIndex].name}・第 ${s.night} 晚・累積賺進 <span id="menuTotal">🪙 ${fmt(s.totalEarnings)}</span></p>
-        <p style="text-align:left;margin:10px 0 4px">單位表示法</p><div class="qbtns"><button data-not="zh" class="${(s.notation || 'zh') === 'zh' ? 'on' : ''}">中文</button><button data-not="en" class="${s.notation === 'en' ? 'on' : ''}">英文</button><button data-not="en-short" class="${s.notation === 'en-short' ? 'on' : ''}">英文簡寫</button><button data-not="sci" class="${s.notation === 'sci' ? 'on' : ''}">科學記號</button></div>
+        <p style="text-align:left;margin:10px 0 4px">單位表示法</p><div class="qbtns"><button data-not="zh" class="${(s.notation || 'zh') === 'zh' ? 'on' : ''}">中文</button><button data-not="en" class="${s.notation === 'en' ? 'on' : ''}" class="hidden">英文</button><button data-not="en-short" class="${s.notation === 'en-short' ? 'on' : ''}">英文簡寫</button><button data-not="sci" class="${s.notation === 'sci' ? 'on' : ''}">科學記號</button></div>
         <p style="text-align:left;margin:10px 0 4px">畫質</p><div class="qbtns">${Object.entries(QUALITY).map(([k, v]) => `<button data-q="${k}" class="${k === World.quality ? 'on' : ''}">${v.label}</button>`).join('')}</div>
         <p style="text-align:left;margin:10px 0 4px">音效</p><div class="qbtns"><button data-s="on" class="${s.muted ? '' : 'on'}">🔊 開</button><button data-s="off" class="${s.muted ? 'on' : ''}">🔇 關</button></div>
         <p class="muted" style="font-size:12px">進度每 ${CONFIG.autosaveSeconds} 秒自動存檔，關閉頁面時也會存。</p>
