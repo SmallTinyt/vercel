@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="made by smalltin">
+  <title>905 園遊會投票、提案</title>
+  <style>
+    :root {
+      --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      --card-bg: rgba(30, 41, 59, 0.85);
+      --card-border: rgba(255, 255, 255, 0.12);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.25);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Microsoft JhengHei", "PingFang TC", "Noto Sans TC", sans-serif;
+      background: var(--bg-gradient);
+      color: var(--text-main);
+      min-height: 100vh;
+      padding: 32px 16px 80px;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 880px;
+      margin: 0 auto;
+    }
+
+    /* 頁首標題 */
+    header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      color: #7dd3fc;
+      padding: 5px 14px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background: #727272;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #727272;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.2); }
+    }
+
+    h1 {
+      font-size: 2.1rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      background: linear-gradient(90deg, #ffffff, #bae6fd);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 1rem;
+    }
+
+    /* 頁簽導覽列 (3個頁簽) */
+    .tabs-nav {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 28px;
+      background: rgba(15, 23, 42, 0.6);
+      padding: 6px;
+      border-radius: 16px;
+      border: 1px solid var(--card-border);
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 12px 14px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 0.98rem;
+      font-weight: 700;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-main);
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, #0284c7, #2563eb);
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+    }
+
+    /* 卡片區塊 */
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 32px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+    }
+
+    .tab-panel {
+      display: none;
+      animation: fadeIn 0.35s ease;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 投票進度條樣式 */
+    .option-list {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .option-item {
+      background: rgba(15, 23, 42, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 22px 24px;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .option-item:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .option-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 12px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .option-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .option-rank {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      font-weight: 800;
+      font-size: 0.9rem;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+
+    .option-name {
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+
+    .option-desc {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+    }
+
+    .option-stats {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    .option-percent {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .option-count {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    /* 進度條軌道 */
+    .progress-track {
+      width: 100%;
+      height: 20px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.4);
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .progress-fill::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.25) 50%,
+        rgba(255, 255, 255, 0) 100%
+      );
+      animation: shimmer 2.2s infinite;
+    }
+
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    .color-1 { background: linear-gradient(90deg, #3b82f6, #06b6d4); }
+    .color-2 { background: linear-gradient(90deg, #8b5cf6, #ec4899); }
+    .color-3 { background: linear-gradient(90deg, #f59e0b, #ef4444); }
+
+    .notice-bar {
+      margin-top: 24px;
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      padding-top: 18px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    /* 活動要點頁簽樣式 */
+    .section-title {
+      font-size: 1.35rem;
+      margin-bottom: 16px;
+      color: #e2e8f0;
+      border-left: 4px solid #38bdf8;
+      padding-left: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .highlights-list {
+      background: rgba(15, 23, 42, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 20px 24px 20px 40px;
+      margin-bottom: 28px;
+    }
+
+    .highlights-list li {
+      margin-bottom: 10px;
+      color: #e2e8f0;
+      font-size: 1.02rem;
+    }
+
+    .highlights-list li:last-child {
+      margin-bottom: 0;
+    }
+
+    /* 照片展示區（單張完整呈現） */
+    .photo-gallery {
+      display: flex;
+      justify-content: center;
+      margin-top: 8px;
+    }
+
+    .photo-card {
+      width: 100%;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .photo-card img {
+      width: 100%;
+      height: auto;
+      max-height: 75vh;
+      object-fit: contain;
+      display: block;
+      background: #0f172a;
+    }
+
+    .photo-caption {
+      padding: 12px 16px;
+      font-size: 0.95rem;
+      color: #cbd5e1;
+      text-align: center;
+    }
+
+    /* ==========================================
+       頁簽 3：園遊會販售提案樣式
+       ========================================== */
+    .proposal-form-card {
+      background: rgba(15, 23, 42, 0.55);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-radius: 16px;
+      padding: 22px;
+      margin-bottom: 30px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.88rem;
+      color: #cbd5e1;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(15, 23, 42, 0.9);
+      color: #fff;
+      font-size: 0.95rem;
+      font-family: inherit;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #38bdf8;
+    }
+
+    .submit-btn {
+      background: linear-gradient(135deg, #0284c7, #2563eb);
+      color: #fff;
+      border: none;
+      padding: 11px 24px;
+      border-radius: 10px;
+      font-size: 0.98rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .submit-btn:hover {
+      opacity: 0.92;
+      transform: translateY(-1px);
+    }
+
+    .submit-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .sync-status {
+      font-size: 0.82rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-weight: 600;
+    }
+
+    .sync-cloud {
+      background: rgba(16, 185, 129, 0.18);
+      color: #6ee7b7;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+    }
+
+    .sync-local {
+      background: rgba(245, 158, 11, 0.18);
+      color: #fcd34d;
+      border: 1px solid rgba(245, 158, 11, 0.35);
+    }
+
+    .proposal-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .proposal-card {
+      background: rgba(15, 23, 42, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .proposal-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(56, 189, 248, 0.35);
+    }
+
+    .proposal-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      gap: 8px;
+    }
+
+    .category-tag {
+      font-size: 0.78rem;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-weight: 700;
+      background: rgba(56, 189, 248, 0.18);
+      color: #7dd3fc;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+
+    .proposal-price {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #fbbf24;
+    }
+
+    .proposal-item-name {
+      font-size: 1.18rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .proposal-reason {
+      font-size: 0.92rem;
+      color: #cbd5e1;
+      margin-bottom: 14px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .proposal-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding-top: 10px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 36px 20px;
+      color: var(--text-muted);
+      background: rgba(15, 23, 42, 0.4);
+      border-radius: 14px;
+      border: 1px dashed rgba(255, 255, 255, 0.15);
+    }
+
+    /* 右下角快速調整按鈕與編輯面板 */
+    .edit-toggle-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(30, 41, 59, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #cbd5e1;
+      padding: 10px 16px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+      transition: all 0.2s ease;
+      z-index: 100;
+    }
+
+    .edit-toggle-btn:hover {
+      background: #0284c7;
+      color: #fff;
+      border-color: #38bdf8;
+    }
+
+    .editor-panel {
+      display: none;
+      margin-top: 28px;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      border-radius: 18px;
+      padding: 24px;
+    }
+
+    .editor-panel.open {
+      display: block;
+    }
+
+    .editor-panel h3 {
+      margin-bottom: 16px;
+      color: #38bdf8;
+      font-size: 1.15rem;
+    }
+
+    .editor-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .editor-box {
+      background: rgba(30, 41, 59, 0.7);
+      padding: 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .editor-box label {
+      display: block;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      margin-top: 8px;
+    }
+
+    .editor-box label:first-child {
+      margin-top: 0;
+    }
+
+    .editor-box input,
+    .editor-panel textarea {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: #0f172a;
+      color: #fff;
+      font-size: 0.9rem;
+    }
+
+    .editor-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .btn-small {
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.88rem;
+    }
+
+    .btn-primary {
+      background: #0284c7;
+      color: #fff;
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.12);
+      color: #e2e8f0;
+    }
+
+    @media (max-width: 600px) {
+      .card { padding: 20px; }
+      h1 { font-size: 1.65rem; }
+      .option-percent { font-size: 1.25rem; }
+      .tab-btn { font-size: 0.88rem; padding: 10px 8px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- 頂部標題區 -->
+    <header>
+      <div class="status-badge">
+        <span class="status-dot"></span>
+        <span id="badgeText">投票已截止</span>
+      </div>
+      <h1 id="pageTitle">年度主題活動票選進度</h1>
+      <p class="subtitle" id="pageSubtitle">以下為目前三個選項的最新累計進度（僅供檢視，不開放線上投票）</p>
+    </header>
+
+    <!-- 頁簽切換按鈕 (3個頁簽) -->
+    <nav class="tabs-nav">
+      <button class="tab-btn active" onclick="switchTab('vote')">📊 投票進度</button>
+      <button class="tab-btn" onclick="switchTab('info')">📌 活動要點</button>
+      <button class="tab-btn" onclick="switchTab('market')">🎪 園遊會提案</button>
+    </nav>
+
+    <main class="card">
+      <!-- 頁簽 1：投票進度條 -->
+      <section id="tab-vote" class="tab-panel active">
+        <div class="option-list" id="optionList"></div>
+        <div class="notice-bar" id="updateNotice">
+          ※ 本頁面為進度展示看板，數據由主辦單位定期更新。
+        </div>
+      </section>
+
+      <!-- 頁簽 2：活動要點（單張照片） -->
+      <section id="tab-info" class="tab-panel">
+        <div class="photo-gallery" id="photoGallery"></div>
+      </section>
+
+      <!-- 頁簽 3：園遊會販售提案 -->
+      <section id="tab-market" class="tab-panel">
+        <div class="section-title">
+          <span>💡 提交園遊會販售提案</span>
+          <span id="syncBadge" class="sync-status sync-local">💾 本機儲存模式</span>
+        </div>
+
+        <form class="proposal-form-card" onsubmit="submitProposal(event)">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="propItem">想賣的東西（品項名稱）*</label>
+              <input type="text" id="propItem" placeholder="例如：手工焦糖布丁、套圈圈" required>
+            </div>
+            <div class="form-group">
+              <label for="propCategory">商品類別</label>
+              <select id="propCategory">
+                <option value="🍔 熟食小吃">🍔 熟食小吃</option>
+                <option value="🧋 飲品甜點">🧋 飲品甜點</option>
+                <option value="🎯 遊戲互動">🎯 遊戲互動</option>
+                <option value="🎁 手作與二手物">🎁 手作與二手物</option>
+                <option value="✨ 其他創意">✨ 其他創意</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="propPrice">建議售價 / 預估成本</label>
+              <input type="text" id="propPrice" placeholder="例如：售價 50 元 / 成本約 20 元">
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label for="propDesc">提案說明（準備方式、特色或需要什麼器材）*</label>
+            <textarea id="propDesc" rows="3" placeholder="例如：只需保冰桶即可販售，夏天大家都很喜歡！" required></textarea>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <button type="submit" id="submitPropBtn" class="submit-btn">🚀 送出提案</button>
+            <button type="button" class="btn-small btn-secondary" onclick="fetchProposals()">🔄 重新整理清單</button>
+          </div>
+        </form>
+
+        <div class="section-title">
+          <span>📋 目前大家的提案清單 (<span id="proposalCount">0</span>)</span>
+        </div>
+        <div id="proposalList" class="proposal-list"></div>
+      </section>
+    </main>
+
+    <!-- 快速編輯面板 -->
+    <div id="editorPanel" class="editor-panel">
+      <h3>⚙️ 管理員設定面板</h3>
+
+      <!-- 雲端同步設定（讓 Vercel 上的所有使用者看到彼此的提案） -->
+      <div class="editor-box" style="margin-bottom: 18px; border-color: rgba(56, 189, 248, 0.4);">
+        <strong style="color:#38bdf8;">🌐 跨使用者雲端同步網址（部署在 vercel.app 必看）</strong>
+        <p style="font-size:0.82rem; color:#94a3b8; margin: 6px 0 10px;">
+          單一 HTML 檔案若未連接雲端資料庫，提案只會存在各自的手機/電腦裡。若要讓所有打開 <code>vercel.app</code> 的人都看到彼此新增的提案，請填入 <b>Firebase Realtime Database</b> 網址（例如 <code>https://你的專案.firebaseio.com/proposals.json</code>），或直接在程式碼頂部設定 <code>CLOUD_DATABASE_URL</code>。
+        </p>
+        <input type="text" id="editCloudUrl" placeholder="https://your-project-default-rtdb.firebaseio.com/proposals.json">
+      </div>
+
+      <div class="editor-grid" id="editorOptionsGrid"></div>
+
+      <div class="editor-grid" id="editorPhotosGrid"></div>
+
+      <div class="editor-actions">
+        <button class="btn-small btn-primary" onclick="applyEditorChanges()">✅ 套用並儲存修改</button>
+        <button class="btn-small btn-secondary" onclick="exportConfigCode()">📋 複製設定碼（用於貼回 index.html 再部署 Vercel）</button>
+        <button class="btn-small btn-secondary" onclick="resetToDefault()">🔄 還原預設值</button>
+      </div>
+    </div>
+  </div>
+
+  <button class="edit-toggle-btn" onclick="toggleEditor()" style="display:none">⚙️ 修改選項 / 進度 / 設定</button>
+
+  <script>
+    /* =========================================================================
+       ★ 預設資料設定區 (部署到 Vercel 前可直接修改這裡，讓所有人看到最新內容)
+       ========================================================================= */
+    const DEFAULT_CONFIG = {
+      title: "舉辦園遊會票選進度",
+      subtitle: "",
+      notice: "※ 未投票和重複投票者，視為沒意見",
+
+      // ★ 若要讓所有人在 vercel.app 即時共享新增的園遊會提案，請填入 Firebase Realtime Database 網址
+      // 範例: "https://your-project-default-rtdb.firebaseio.com/proposals.json"
+      cloudDatabaseUrl: "https://poll-smalltin-default-rtdb.asia-southeast1.firebasedatabase.app/proposals.json",
+
+      // 三個投票選項設定（percent 為 0 ~ 100 的進度條百分比）
+      options: [
+        {
+          name: "要",
+          desc: "",
+          percent: 55,
+          countText: "11 票",
+          colorClass: "color-1"
+        },
+        {
+          name: "沒意見／都可以",
+          desc: "",
+          percent: 10,
+          countText: "2 票",
+          colorClass: "color-2"
+        },
+        {
+          name: "不要",
+          desc: "",
+          percent: 35,
+          countText: "7 票",
+          colorClass: "color-3"
+        }
+      ],
+
+      // 活動要點照片設定（可以把 url 換成同資料夾下的照片檔名，例如 "photo1.jpg"）
+      photos: [
+        {
+          url: "https://scontent.ftpe20-2.fna.fbcdn.net/v/t1.15752-9/912031072_1708155217691461_4723290093041601064_n.jpg?stp=dst-jpg_s960x960_tt6&_nc_cat=104&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=9f807c&_nc_ohc=WCiLHgqq14oQ7kNvwGDa5eo&_nc_oc=AdrNnuNb5_hWTjxTxajCW6Tb7e7IOXC7XCA4X-ZhO9kwNA65tNec6dsKZuQP5MPAUAMNEVkp7jhBV8mZjTU--YGu&_nc_zt=23&_nc_ht=scontent.ftpe20-2.fna&_nc_ss=7b6a8&oh=03_Q7cD6wFUF4_BrAkeQJMixSFs61Aq5MKYtoGxgpXvwE034ve2RA&oe=6B23F100",
+          caption: ""
+        }
+      ],
+
+      // 預設園遊會提案清單（所有人打開網頁都會看到的初始提案）
+      defaultProposals: [
+      ]
+    };
+
+    const STORAGE_KEY = "custom_vote_progress_config_v2";
+    const PROPOSALS_LOCAL_KEY = "custom_fair_proposals_v2";
+
+    let appData = loadData();
+    let proposals = loadLocalProposals();
+
+    function loadData() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (!parsed.cloudDatabaseUrl) {
+            parsed.cloudDatabaseUrl = DEFAULT_CONFIG.cloudDatabaseUrl;
+          }
+          parsed.photos = (parsed.photos && parsed.photos.length)
+            ? [parsed.photos[0]]
+            : JSON.parse(JSON.stringify(DEFAULT_CONFIG.photos));
+          delete parsed.highlights;
+          return { ...DEFAULT_CONFIG, ...parsed };
+        }
+      } catch (e) {}
+      return JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+    }
+
+    function loadLocalProposals() {
+      try {
+        const saved = localStorage.getItem(PROPOSALS_LOCAL_KEY);
+        if (saved) return JSON.parse(saved);
+      } catch (e) {}
+      return JSON.parse(JSON.stringify(DEFAULT_CONFIG.defaultProposals));
+    }
+
+    function getCloudUrl() {
+      return (appData.cloudDatabaseUrl || DEFAULT_CONFIG.cloudDatabaseUrl || "").trim();
+    }
+
+    function renderPage() {
+      document.getElementById("pageTitle").textContent = appData.title;
+      document.getElementById("pageSubtitle").textContent = appData.subtitle;
+      document.getElementById("updateNotice").textContent = appData.notice;
+
+      // 渲染三個選項進度條
+      const optionList = document.getElementById("optionList");
+      optionList.innerHTML = appData.options.map((opt, idx) => {
+        const safePercent = Math.max(0, Math.min(100, Number(opt.percent) || 0));
+        return `
+          <div class="option-item">
+            <div class="option-header">
+              <div class="option-title-wrap">
+                <span class="option-rank">${idx + 1}</span>
+                <span class="option-name">${escapeHtml(opt.name)}</span>
+              </div>
+              <div class="option-stats">
+                <span class="option-percent">${safePercent}%</span>
+                <span class="option-count">${escapeHtml(opt.countText || "")}</span>
+              </div>
+            </div>
+            ${opt.desc ? `<div class="option-desc">${escapeHtml(opt.desc)}</div>` : ""}
+            <div class="progress-track">
+              <div class="progress-fill ${opt.colorClass || `color-${(idx % 3) + 1}`}" style="width: ${safePercent}%"></div>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      // 渲染活動要點單張照片
+      const photoGallery = document.getElementById("photoGallery");
+      photoGallery.innerHTML = appData.photos.slice(0, 1).map(photo => `
+        <div class="photo-card">
+          <img src="${escapeHtml(photo.url)}" alt="${escapeHtml(photo.caption || "活動要點")}">
+          ${photo.caption ? `<div class="photo-caption">${escapeHtml(photo.caption)}</div>` : ""}
+        </div>
+      `).join("");
+
+      // 更新雲端狀態標籤
+      const syncBadge = document.getElementById("syncBadge");
+      if (getCloudUrl()) {
+        syncBadge.className = "sync-status sync-cloud";
+        syncBadge.textContent = "🌐 雲端同步已啟用（所有人皆可見）";
+      } else {
+        syncBadge.className = "sync-status sync-local";
+        syncBadge.textContent = "💾 本機模式（可於右下角設定雲端同步）";
+      }
+
+      renderProposals();
+    }
+
+    function renderProposals() {
+      const listEl = document.getElementById("proposalList");
+      const countEl = document.getElementById("proposalCount");
+      countEl.textContent = proposals.length;
+
+      if (!proposals.length) {
+        listEl.innerHTML = `<div class="empty-state" style="grid-column: 1 / -1;">目前還沒有提案，快成為第一個提案的人吧！</div>`;
+        return;
+      }
+
+      listEl.innerHTML = proposals.map(p => `
+        <div class="proposal-card">
+          <div>
+            <div class="proposal-top">
+              <span class="category-tag">${escapeHtml(p.category || "✨ 其他創意")}</span>
+              ${p.price ? `<span class="proposal-price">${escapeHtml(p.price)}</span>` : ""}
+            </div>
+            <div class="proposal-item-name">${escapeHtml(p.item)}</div>
+            <div class="proposal-reason">${escapeHtml(p.desc)}</div>
+          </div>
+          <div class="proposal-meta">
+            <span>🕒 提案時間</span>
+            <span>${escapeHtml(p.time || "")}</span>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    // 從雲端讀取提案（若有設定 cloudDatabaseUrl）
+    async function fetchProposals() {
+      const url = getCloudUrl();
+      if (!url) {
+        proposals = loadLocalProposals();
+        renderProposals();
+        return;
+      }
+
+      try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("Network error");
+        const data = await res.json();
+        if (!data) {
+          proposals = [];
+        } else if (Array.isArray(data)) {
+          proposals = data;
+        } else if (typeof data === "object") {
+          // 相容 Firebase Realtime Database POST 產生的物件結構
+          proposals = Object.values(data).reverse();
+        }
+        localStorage.setItem(PROPOSALS_LOCAL_KEY, JSON.stringify(proposals));
+        renderProposals();
+      } catch (err) {
+        console.warn("讀取雲端提案失敗，使用本機快取：", err);
+        renderProposals();
+      }
+    }
+
+    // 新增園遊會提案
+    async function submitProposal(e) {
+      e.preventDefault();
+      const btn = document.getElementById("submitPropBtn");
+      const item = document.getElementById("propItem").value.trim();
+      const category = document.getElementById("propCategory").value;
+      const price = document.getElementById("propPrice").value.trim();
+      const desc = document.getElementById("propDesc").value.trim();
+
+      if (!item || !desc) return;
+
+      const now = new Date();
+      const timeStr = `${now.getFullYear()}/${String(now.getMonth() + 1).padStart(2, "0")}/${String(now.getDate()).padStart(2, "0")} ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+
+      const newProposal = {
+        id: "prop-" + Date.now(),
+        item,
+        category,
+        price,
+        desc,
+        time: timeStr
+      };
+
+      btn.disabled = true;
+      btn.textContent = "⏳ 傳送中...";
+
+      const url = getCloudUrl();
+      if (url) {
+        try {
+          await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(newProposal)
+          });
+          await fetchProposals();
+        } catch (err) {
+          alert("雲端同步失敗，已先儲存於您的瀏覽器中！");
+          proposals.unshift(newProposal);
+          localStorage.setItem(PROPOSALS_LOCAL_KEY, JSON.stringify(proposals));
+          renderProposals();
+        }
+      } else {
+        proposals.unshift(newProposal);
+        localStorage.setItem(PROPOSALS_LOCAL_KEY, JSON.stringify(proposals));
+        renderProposals();
+      }
+
+      document.getElementById("propItem").value = "";
+      document.getElementById("propPrice").value = "";
+      document.getElementById("propDesc").value = "";
+      btn.disabled = false;
+      btn.textContent = "🚀 送出提案";
+    }
+
+    // 頁簽切換
+    function switchTab(tabName) {
+      const tabs = ["vote", "info", "market"];
+      const buttons = document.querySelectorAll(".tab-btn");
+      tabs.forEach((t, idx) => {
+        buttons[idx].classList.toggle("active", t === tabName);
+        document.getElementById(`tab-${t}`).classList.toggle("active", t === tabName);
+      });
+      if (tabName === "market") {
+        fetchProposals();
+      }
+    }
+
+    // 編輯器渲染與操作
+    function renderEditor() {
+      document.getElementById("editCloudUrl").value = appData.cloudDatabaseUrl || "";
+
+      const optGrid = document.getElementById("editorOptionsGrid");
+      optGrid.innerHTML = appData.options.map((opt, i) => `
+        <div class="editor-box">
+          <strong style="color:#7dd3fc;">選項 ${i + 1}</strong>
+          <label>選項名稱</label>
+          <input type="text" id="opt_name_${i}" value="${escapeHtml(opt.name)}">
+          <label>選項說明</label>
+          <input type="text" id="opt_desc_${i}" value="${escapeHtml(opt.desc || "")}">
+          <label>進度百分比 (0 ~ 100)</label>
+          <input type="number" id="opt_percent_${i}" min="0" max="100" value="${opt.percent}">
+          <label>副標文字（例如票數）</label>
+          <input type="text" id="opt_count_${i}" value="${escapeHtml(opt.countText || "")}">
+        </div>
+      `).join("");
+
+      const photoGrid = document.getElementById("editorPhotosGrid");
+      photoGrid.innerHTML = appData.photos.slice(0, 1).map((photo, i) => `
+        <div class="editor-box">
+          <strong style="color:#7dd3fc;">活動要點照片</strong>
+          <label>圖片網址或本地檔名 (如 photo.jpg)</label>
+          <input type="text" id="photo_url_${i}" value="${escapeHtml(photo.url)}">
+          <label>或直接從電腦選擇照片檔案</label>
+          <input type="file" accept="image/*" onchange="handleLocalImage(${i}, this)">
+          <label>照片下方說明文字（可留空）</label>
+          <input type="text" id="photo_cap_${i}" value="${escapeHtml(photo.caption || "")}">
+        </div>
+      `).join("");
+    }
+
+    function handleLocalImage(index, inputEl) {
+      const file = inputEl.files && inputEl.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        document.getElementById(`photo_url_${index}`).value = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function toggleEditor() {
+      const panel = document.getElementById("editorPanel");
+      panel.classList.toggle("open");
+      if (panel.classList.contains("open")) {
+        renderEditor();
+        panel.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+
+    function applyEditorChanges() {
+      appData.cloudDatabaseUrl = document.getElementById("editCloudUrl").value.trim();
+
+      appData.options.forEach((opt, i) => {
+        opt.name = document.getElementById(`opt_name_${i}`).value;
+        opt.desc = document.getElementById(`opt_desc_${i}`).value;
+        opt.percent = Number(document.getElementById(`opt_percent_${i}`).value) || 0;
+        opt.countText = document.getElementById(`opt_count_${i}`).value;
+      });
+
+      appData.photos = appData.photos.slice(0, 1).map((photo, i) => ({
+        url: document.getElementById(`photo_url_${i}`).value,
+        caption: document.getElementById(`photo_cap_${i}`).value
+      }));
+
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+      } catch (e) {
+        alert("圖片檔案較大時可能超過瀏覽器暫存限制，建議將圖片放在同資料夾並填寫檔名（如 photo1.jpg）。");
+      }
+
+      renderPage();
+      fetchProposals();
+    }
+
+    function exportConfigCode() {
+      const exportObj = {
+        ...appData,
+        defaultProposals: proposals
+      };
+      const code = "const DEFAULT_CONFIG = " + JSON.stringify(exportObj, null, 2) + ";";
+      navigator.clipboard.writeText(code).then(() => {
+        alert("已複製最新 DEFAULT_CONFIG 程式碼！您可以貼回 index.html 替換原本的 DEFAULT_CONFIG，重新上傳 Vercel 後所有人都能看到最新進度與提案。");
+      });
+    }
+
+    function resetToDefault() {
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(PROPOSALS_LOCAL_KEY);
+      appData = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+      proposals = JSON.parse(JSON.stringify(DEFAULT_CONFIG.defaultProposals));
+      renderEditor();
+      renderPage();
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    // 初始化渲染
+    renderPage();
+    fetchProposals();
+  </script>
+</body>
+</html>
