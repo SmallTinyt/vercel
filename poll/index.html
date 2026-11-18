@@ -356,12 +356,125 @@
       overflow: hidden;
       border-radius: 10px;
       background: #0f172a;
+      cursor: zoom-in;
     }
 
     .photo-stage img {
       display: block;
       object-fit: contain;
       background: #0f172a;
+      transition: opacity 0.2s;
+    }
+
+    .zoom-hint {
+      text-align: center;
+      font-size: 0.88rem;
+      color: #7dd3fc;
+      margin-top: 10px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .zoom-hint:hover {
+      text-decoration: underline;
+    }
+
+    /* 圖片點擊放大燈箱 (Lightbox) */
+    .lightbox-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.94);
+      backdrop-filter: blur(8px);
+      z-index: 9999;
+      flex-direction: column;
+    }
+
+    .lightbox-overlay.open {
+      display: flex;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .lightbox-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 20px;
+      background: rgba(15, 23, 42, 0.9);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      flex-shrink: 0;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .lightbox-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .lb-btn {
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #f8fafc;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .lb-btn:hover {
+      background: #0284c7;
+      border-color: #38bdf8;
+    }
+
+    .lb-close-btn {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: rgba(239, 68, 68, 0.45);
+      color: #fca5a5;
+    }
+
+    .lb-close-btn:hover {
+      background: #dc2626;
+      color: #fff;
+    }
+
+    .lb-zoom-text {
+      min-width: 54px;
+      text-align: center;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #7dd3fc;
+    }
+
+    .lightbox-viewport {
+      flex: 1;
+      overflow: auto;
+      display: flex;
+      padding: 20px;
+      cursor: grab;
+    }
+
+    .lightbox-viewport:active {
+      cursor: grabbing;
+    }
+
+    .lightbox-stage {
+      position: relative;
+      margin: auto;
+      flex-shrink: 0;
+      overflow: hidden;
+      border-radius: 8px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+    }
+
+    .lightbox-stage img {
+      display: block;
+      object-fit: contain;
+      user-select: none;
+      -webkit-user-drag: none;
     }
 
     .photo-caption {
@@ -751,6 +864,24 @@
 
   <button class="edit-toggle-btn" onclick="toggleEditor()" style="display:none">⚙️ 修改選項 / 進度 / 設定</button>
 
+  <!-- 圖片全螢幕放大檢視燈箱 -->
+  <div id="lightboxOverlay" class="lightbox-overlay" onclick="handleLightboxBackdrop(event)">
+    <div class="lightbox-header">
+      <div class="lightbox-controls">
+        <button type="button" class="lb-btn" onclick="changeZoom(-0.4)">➖ 縮小</button>
+        <span id="lbZoomText" class="lb-zoom-text">100%</span>
+        <button type="button" class="lb-btn" onclick="changeZoom(0.4)">➕ 放大</button>
+        <button type="button" class="lb-btn" onclick="resetZoom()">100% 重置</button>
+      </div>
+      <button type="button" class="lb-btn lb-close-btn" onclick="closeLightbox()">✕ 關閉</button>
+    </div>
+    <div id="lightboxViewport" class="lightbox-viewport">
+      <div id="lightboxStage" class="lightbox-stage" ondblclick="toggleDoubleClickZoom()">
+        <img id="lightboxImg" src="" alt="放大檢視">
+      </div>
+    </div>
+  </div>
+
   <script>
     /* =========================================================================
        ★ 預設資料設定區 (部署到 Vercel 前可直接修改這裡，讓所有人看到最新內容)
@@ -858,16 +989,17 @@
         `;
       }).join("");
 
-      // 渲染活動要點單張照片（含自動無裁切轉正與手動旋轉按鈕）
+      // 渲染活動要點單張照片（含自動無裁切轉正與點擊放大檢視）
       const photoGallery = document.getElementById("photoGallery");
       photoGallery.innerHTML = appData.photos.slice(0, 1).map(photo => `
         <div class="photo-toolbar">
           <button type="button" class="rotate-btn" onclick="rotatePhoto90()" style="display:none">🔄 旋轉方向</button>
         </div>
         <div class="photo-card" id="photoCardWrap">
-          <div class="photo-stage" id="photoStage">
+          <div class="photo-stage" id="photoStage" onclick="openLightbox()" title="點擊放大檢視">
             <img id="highlightImg" src="${escapeHtml(photo.url)}" alt="${escapeHtml(photo.caption || "活動要點")}" onload="adjustPhotoRotation()">
           </div>
+          <div class="zoom-hint" onclick="openLightbox()">🔍 點擊照片可放大檢視</div>
           ${photo.caption ? `<div class="photo-caption">${escapeHtml(photo.caption)}</div>` : ""}
         </div>
       `).join("");
@@ -875,6 +1007,129 @@
       requestAnimationFrame(adjustPhotoRotation);
       renderProposals();
     }
+
+    // ==========================================
+    // 圖片放大檢視燈箱邏輯 (支援旋轉後的無裁切縮放與拖曳)
+    // ==========================================
+    let currentZoom = 1;
+
+    function openLightbox() {
+      const photo = (appData.photos && appData.photos[0]);
+      if (!photo) return;
+      const overlay = document.getElementById("lightboxOverlay");
+      const lbImg = document.getElementById("lightboxImg");
+      lbImg.src = photo.url;
+      currentZoom = 1.4; // 打開時預設放大至 140% 方便閱讀文字
+      overlay.classList.add("open");
+      document.body.style.overflow = "hidden";
+      lbImg.onload = updateLightboxStage;
+      requestAnimationFrame(updateLightboxStage);
+    }
+
+    function closeLightbox() {
+      const overlay = document.getElementById("lightboxOverlay");
+      overlay.classList.remove("open");
+      document.body.style.overflow = "";
+    }
+
+    function handleLightboxBackdrop(e) {
+      if (e.target.id === "lightboxViewport" || e.target.id === "lightboxOverlay") {
+        closeLightbox();
+      }
+    }
+
+    function changeZoom(delta) {
+      currentZoom = Math.max(0.6, Math.min(4, Math.round((currentZoom + delta) * 10) / 10));
+      updateLightboxStage();
+    }
+
+    function resetZoom() {
+      currentZoom = 1;
+      updateLightboxStage();
+    }
+
+    function toggleDoubleClickZoom() {
+      currentZoom = currentZoom < 2 ? 2.2 : 1;
+      updateLightboxStage();
+    }
+
+    function updateLightboxStage() {
+      const lbImg = document.getElementById("lightboxImg");
+      const lbStage = document.getElementById("lightboxStage");
+      const zoomText = document.getElementById("lbZoomText");
+      if (!lbImg || !lbStage) return;
+
+      zoomText.textContent = Math.round(currentZoom * 100) + "%";
+
+      const photo = (appData.photos && appData.photos[0]) || { rotate: 0 };
+      const angle = ((Number(photo.rotate) || 0) % 360 + 360) % 360;
+      const nw = lbImg.naturalWidth || 960;
+      const nh = lbImg.naturalHeight || 960;
+
+      const baseW = Math.min(window.innerWidth - 40, 820);
+
+      if (angle === 90 || angle === 270) {
+        const uprightW = Math.round(baseW * currentZoom);
+        const uprightH = Math.round(uprightW * (nw / nh));
+        lbStage.style.width = uprightW + "px";
+        lbStage.style.height = uprightH + "px";
+        lbImg.style.width = uprightH + "px";
+        lbImg.style.height = uprightW + "px";
+        lbImg.style.position = "absolute";
+        lbImg.style.top = "50%";
+        lbImg.style.left = "50%";
+        lbImg.style.transform = `translate(-50%, -50%) rotate(${angle}deg)`;
+      } else {
+        const uprightW = Math.round(baseW * currentZoom);
+        const uprightH = Math.round(uprightW * (nh / nw));
+        lbStage.style.width = uprightW + "px";
+        lbStage.style.height = uprightH + "px";
+        lbImg.style.width = uprightW + "px";
+        lbImg.style.height = uprightH + "px";
+        lbImg.style.position = "static";
+        lbImg.style.transform = angle ? `rotate(${angle}deg)` : "none";
+      }
+    }
+
+    // 支援 ESC 關閉、滑鼠滾輪縮放與滑鼠拖曳平移
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeLightbox();
+    });
+
+    (function initLightboxInteractions() {
+      const vp = document.getElementById("lightboxViewport");
+      if (!vp) return;
+
+      vp.addEventListener("wheel", (e) => {
+        if (!document.getElementById("lightboxOverlay").classList.contains("open")) return;
+        if (e.ctrlKey || e.metaKey) {
+          e.preventDefault();
+          changeZoom(e.deltaY < 0 ? 0.25 : -0.25);
+        }
+      }, { passive: false });
+
+      let isDragging = false;
+      let startX = 0, startY = 0, scrollL = 0, scrollT = 0;
+
+      vp.addEventListener("mousedown", (e) => {
+        if (e.target.tagName === "BUTTON") return;
+        isDragging = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        scrollL = vp.scrollLeft;
+        scrollT = vp.scrollTop;
+      });
+
+      window.addEventListener("mousemove", (e) => {
+        if (!isDragging) return;
+        vp.scrollLeft = scrollL - (e.clientX - startX);
+        vp.scrollTop = scrollT - (e.clientY - startY);
+      });
+
+      window.addEventListener("mouseup", () => {
+        isDragging = false;
+      });
+    })();
 
     // 計算旋轉後的圖片尺寸，確保轉正 90/-90 度時完整顯示不裁切
     function adjustPhotoRotation() {
