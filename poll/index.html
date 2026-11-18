@@ -702,16 +702,6 @@
               <label for="propItem">想賣的東西（品項名稱）*</label>
               <input type="text" id="propItem" placeholder="例如：手工焦糖布丁、套圈圈" required>
             </div>
-            <div class="form-group" style="display:none">
-              <label for="propCategory">商品類別</label>
-              <select id="propCategory">
-                <option value="🍔 熟食小吃">🍔 熟食小吃</option>
-                <option value="🧋 飲品甜點">🧋 飲品甜點</option>
-                <option value="🎯 遊戲互動">🎯 遊戲互動</option>
-                <option value="🎁 手作與二手物">🎁 手作與二手物</option>
-                <option value="✨ 其他創意">✨ 其他創意</option>
-              </select>
-            </div>
             <div class="form-group">
               <label for="propPrice">建議售價 / 預估成本</label>
               <input type="text" id="propPrice" placeholder="例如：售價 50 元 / 成本約 20 元">
@@ -821,14 +811,7 @@
     let proposals = loadLocalProposals();
 
     function loadData() {
-      const data = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
-      try {
-        const savedRotate = localStorage.getItem(PHOTO_ROTATE_KEY);
-        if (savedRotate !== null && data.photos && data.photos[0]) {
-          data.photos[0].rotate = Number(savedRotate);
-        }
-      } catch (e) {}
-      return data;
+      return JSON.parse(JSON.stringify(DEFAULT_CONFIG));
     }
 
     function loadLocalProposals() {
@@ -966,11 +949,8 @@
       listEl.innerHTML = proposals.map(p => `
         <div class="proposal-card">
           <div>
-            <div class="proposal-top">
-              <span class="category-tag">${escapeHtml(p.category || "✨ 其他創意")}</span>
-              ${p.price ? `<span class="proposal-price">${escapeHtml(p.price)}</span>` : ""}
-            </div>
             <div class="proposal-item-name">${escapeHtml(p.item)}</div>
+            ${p.price ? `<div class="proposal-price" style="margin-bottom: 8px;">${escapeHtml(p.price)}</div>` : ""}
             <div class="proposal-reason">${escapeHtml(p.desc)}</div>
           </div>
           <div class="proposal-meta">
@@ -1033,7 +1013,6 @@
       e.preventDefault();
       const btn = document.getElementById("submitPropBtn");
       const item = document.getElementById("propItem").value.trim();
-      const category = document.getElementById("propCategory").value;
       const price = document.getElementById("propPrice").value.trim();
       const desc = document.getElementById("propDesc").value.trim();
 
@@ -1045,7 +1024,6 @@
       const newProposal = {
         id: "prop-" + Date.now(),
         item,
-        category,
         price,
         desc,
         time: timeStr
