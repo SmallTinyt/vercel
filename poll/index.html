@@ -309,11 +309,36 @@
       margin-bottom: 0;
     }
 
-    /* 照片展示區（單張完整呈現） */
+    /* 照片展示區（單張完整呈現，支援無裁切旋轉轉正） */
     .photo-gallery {
       display: flex;
-      justify-content: center;
+      flex-direction: column;
+      align-items: center;
       margin-top: 8px;
+    }
+
+    .photo-toolbar {
+      display: flex;
+      justify-content: flex-end;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+
+    .rotate-btn {
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      color: #7dd3fc;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .rotate-btn:hover {
+      background: #0284c7;
+      color: #fff;
     }
 
     .photo-card {
@@ -322,19 +347,25 @@
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 14px;
       overflow: hidden;
+      padding: 12px;
     }
 
-    .photo-card img {
-      width: 100%;
-      height: auto;
-      max-height: 75vh;
-      object-fit: contain;
+    .photo-stage {
+      position: relative;
+      margin: 0 auto;
+      overflow: hidden;
+      border-radius: 10px;
+      background: #0f172a;
+    }
+
+    .photo-stage img {
       display: block;
+      object-fit: contain;
       background: #0f172a;
     }
 
     .photo-caption {
-      padding: 12px 16px;
+      padding: 12px 16px 4px;
       font-size: 0.95rem;
       color: #cbd5e1;
       text-align: center;
@@ -671,7 +702,7 @@
               <label for="propItem">想賣的東西（品項名稱）*</label>
               <input type="text" id="propItem" placeholder="例如：手工焦糖布丁、套圈圈" required>
             </div>
-            <div class="form-group">
+            <div class="form-group" style="display:none">
               <label for="propCategory">商品類別</label>
               <select id="propCategory">
                 <option value="🍔 熟食小吃">🍔 熟食小吃</option>
@@ -737,7 +768,7 @@
     const DEFAULT_CONFIG = {
       title: "舉辦園遊會票選進度",
       subtitle: "",
-      notice: "※ 未投票和重複投票者，視為沒意見",
+      notice: "※ 未投票和重複投票者，視為棄票",
 
       // ★ 若要讓所有人在 vercel.app 即時共享新增的園遊會提案，請填入 Firebase Realtime Database 網址
       // 範例: "https://your-project-default-rtdb.firebaseio.com/proposals.json"
@@ -768,11 +799,12 @@
         }
       ],
 
-      // 活動要點照片設定（可以把 url 換成同資料夾下的照片檔名，例如 "photo1.jpg"）
+      // 活動要點照片設定（可以把 url 換成同資料夾下的照片檔名，例如 "photo1.jpg"；rotate 可設 90、-90、180 或 0 調整轉正方向）
       photos: [
         {
           url: "https://scontent.ftpe20-2.fna.fbcdn.net/v/t1.15752-9/912031072_1708155217691461_4723290093041601064_n.jpg?stp=dst-jpg_s960x960_tt6&_nc_cat=104&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=9f807c&_nc_ohc=WCiLHgqq14oQ7kNvwGDa5eo&_nc_oc=AdrNnuNb5_hWTjxTxajCW6Tb7e7IOXC7XCA4X-ZhO9kwNA65tNec6dsKZuQP5MPAUAMNEVkp7jhBV8mZjTU--YGu&_nc_zt=23&_nc_ht=scontent.ftpe20-2.fna&_nc_ss=7b6a8&oh=03_Q7cD6wFUF4_BrAkeQJMixSFs61Aq5MKYtoGxgpXvwE034ve2RA&oe=6B23F100",
-          caption: ""
+          caption: "",
+          rotate: -90
         }
       ],
 
@@ -781,34 +813,31 @@
       ]
     };
 
-    const STORAGE_KEY = "custom_vote_progress_config_v2";
-    const PROPOSALS_LOCAL_KEY = "custom_fair_proposals_v2";
+    const STORAGE_KEY = "custom_vote_progress_config_v3";
+    const PROPOSALS_LOCAL_KEY = "custom_fair_proposals_v3";
+    const PHOTO_ROTATE_KEY = "custom_photo_rotate_v3";
 
     let appData = loadData();
     let proposals = loadLocalProposals();
 
     function loadData() {
+      const data = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
       try {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          if (!parsed.cloudDatabaseUrl) {
-            parsed.cloudDatabaseUrl = DEFAULT_CONFIG.cloudDatabaseUrl;
-          }
-          parsed.photos = (parsed.photos && parsed.photos.length)
-            ? [parsed.photos[0]]
-            : JSON.parse(JSON.stringify(DEFAULT_CONFIG.photos));
-          delete parsed.highlights;
-          return { ...DEFAULT_CONFIG, ...parsed };
+        const savedRotate = localStorage.getItem(PHOTO_ROTATE_KEY);
+        if (savedRotate !== null && data.photos && data.photos[0]) {
+          data.photos[0].rotate = Number(savedRotate);
         }
       } catch (e) {}
-      return JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+      return data;
     }
 
     function loadLocalProposals() {
       try {
         const saved = localStorage.getItem(PROPOSALS_LOCAL_KEY);
-        if (saved) return JSON.parse(saved);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
       } catch (e) {}
       return JSON.parse(JSON.stringify(DEFAULT_CONFIG.defaultProposals));
     }
@@ -846,26 +875,82 @@
         `;
       }).join("");
 
-      // 渲染活動要點單張照片
+      // 渲染活動要點單張照片（含自動無裁切轉正與手動旋轉按鈕）
       const photoGallery = document.getElementById("photoGallery");
       photoGallery.innerHTML = appData.photos.slice(0, 1).map(photo => `
-        <div class="photo-card">
-          <img src="${escapeHtml(photo.url)}" alt="${escapeHtml(photo.caption || "活動要點")}">
+        <div class="photo-toolbar">
+          <button type="button" class="rotate-btn" onclick="rotatePhoto90()" style="display:none">🔄 旋轉方向</button>
+        </div>
+        <div class="photo-card" id="photoCardWrap">
+          <div class="photo-stage" id="photoStage">
+            <img id="highlightImg" src="${escapeHtml(photo.url)}" alt="${escapeHtml(photo.caption || "活動要點")}" onload="adjustPhotoRotation()">
+          </div>
           ${photo.caption ? `<div class="photo-caption">${escapeHtml(photo.caption)}</div>` : ""}
         </div>
       `).join("");
 
-      // 更新雲端狀態標籤
+      requestAnimationFrame(adjustPhotoRotation);
+      renderProposals();
+    }
+
+    // 計算旋轉後的圖片尺寸，確保轉正 90/-90 度時完整顯示不裁切
+    function adjustPhotoRotation() {
+      const img = document.getElementById("highlightImg");
+      const stage = document.getElementById("photoStage");
+      const card = document.getElementById("photoCardWrap");
+      if (!img || !stage || !card) return;
+
+      const photo = (appData.photos && appData.photos[0]) || { rotate: 0 };
+      const angle = ((Number(photo.rotate) || 0) % 360 + 360) % 360;
+      const availW = Math.max(240, (card.clientWidth || 720) - 24);
+      const nw = img.naturalWidth || 960;
+      const nh = img.naturalHeight || 960;
+
+      if (angle === 90 || angle === 270) {
+        // 旋轉 90 或 270 度時，直立後的寬高比為 nh : nw
+        const uprightW = availW;
+        const uprightH = Math.round(uprightW * (nw / nh));
+        stage.style.width = uprightW + "px";
+        stage.style.height = uprightH + "px";
+        img.style.width = uprightH + "px";
+        img.style.height = uprightW + "px";
+        img.style.position = "absolute";
+        img.style.top = "50%";
+        img.style.left = "50%";
+        img.style.transform = `translate(-50%, -50%) rotate(${angle}deg)`;
+      } else {
+        stage.style.width = "100%";
+        stage.style.height = "auto";
+        img.style.width = "100%";
+        img.style.height = "auto";
+        img.style.position = "static";
+        img.style.transform = angle ? `rotate(${angle}deg)` : "none";
+      }
+    }
+
+    function rotatePhoto90() {
+      if (!appData.photos || !appData.photos[0]) return;
+      const current = Number(appData.photos[0].rotate) || 0;
+      const next = (current + 90) % 360;
+      appData.photos[0].rotate = next;
+      try {
+        localStorage.setItem(PHOTO_ROTATE_KEY, String(next));
+      } catch (e) {}
+      adjustPhotoRotation();
+    }
+
+    window.addEventListener("resize", adjustPhotoRotation);
+
+    function updateSyncBadge(status, text) {
       const syncBadge = document.getElementById("syncBadge");
-      if (getCloudUrl()) {
+      if (!syncBadge) return;
+      if (status === "cloud") {
         syncBadge.className = "sync-status sync-cloud";
-        syncBadge.textContent = "🌐 雲端同步已啟用（所有人皆可見）";
+        syncBadge.textContent = text || "🌐 雲端同步已啟用（所有人皆可見）";
       } else {
         syncBadge.className = "sync-status sync-local";
-        syncBadge.textContent = "💾 本機模式（可於右下角設定雲端同步）";
+        syncBadge.textContent = text || "💾 本機模式";
       }
-
-      renderProposals();
     }
 
     function renderProposals() {
@@ -900,27 +985,45 @@
     async function fetchProposals() {
       const url = getCloudUrl();
       if (!url) {
+        updateSyncBadge("local", "💾 本機儲存模式");
         proposals = loadLocalProposals();
         renderProposals();
         return;
       }
 
       try {
-        const res = await fetch(url);
-        if (!res.ok) throw new Error("Network error");
-        const data = await res.json();
-        if (!data) {
-          proposals = [];
-        } else if (Array.isArray(data)) {
-          proposals = data;
-        } else if (typeof data === "object") {
-          // 相容 Firebase Realtime Database POST 產生的物件結構
-          proposals = Object.values(data).reverse();
+        const sep = url.includes("?") ? "&" : "?";
+        const res = await fetch(`${url}${sep}_t=${Date.now()}`, { cache: "no-store" });
+        if (!res.ok) {
+          const errBody = await res.json().catch(() => ({}));
+          throw new Error(`HTTP ${res.status}: ${errBody.error || res.statusText}`);
         }
+        const data = await res.json();
+        let cloudList = [];
+        if (Array.isArray(data)) {
+          cloudList = data.filter(Boolean);
+        } else if (data && typeof data === "object") {
+          // 相容 Firebase Realtime Database POST 產生的物件結構
+          cloudList = Object.values(data).filter(Boolean).sort((a, b) => {
+            const ta = String(a.id || "");
+            const tb = String(b.id || "");
+            return tb.localeCompare(ta);
+          });
+        }
+        proposals = cloudList;
         localStorage.setItem(PROPOSALS_LOCAL_KEY, JSON.stringify(proposals));
+        updateSyncBadge("cloud", "🌐 雲端同步已連線（所有人皆可見）");
         renderProposals();
       } catch (err) {
         console.warn("讀取雲端提案失敗，使用本機快取：", err);
+        const isAuthErr = String(err.message || "").includes("401") || String(err.message || "").includes("Permission denied");
+        updateSyncBadge(
+          "local",
+          isAuthErr
+            ? "⚠️ Firebase 規則未開放讀寫 (請將 Rules 設為 true)"
+            : "⚠️ 雲端連線異常（目前顯示本機暫存）"
+        );
+        proposals = loadLocalProposals();
         renderProposals();
       }
     }
@@ -948,28 +1051,38 @@
         time: timeStr
       };
 
-      btn.disabled = true;
-      btn.textContent = "⏳ 傳送中...";
+      // 1. 先立即加入畫面與本機暫存，確保送出後一定會馬上顯示在網頁中
+      proposals.unshift(newProposal);
+      localStorage.setItem(PROPOSALS_LOCAL_KEY, JSON.stringify(proposals));
+      renderProposals();
 
+      btn.disabled = true;
+      btn.textContent = "⏳ 同步雲端中...";
+
+      // 2. 同步寫入 Firebase Realtime Database
       const url = getCloudUrl();
       if (url) {
         try {
-          await fetch(url, {
+          const res = await fetch(url, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(newProposal)
           });
+          if (!res.ok) {
+            const errBody = await res.json().catch(() => ({}));
+            throw new Error(`HTTP ${res.status} (${errBody.error || "Permission denied"})`);
+          }
           await fetchProposals();
         } catch (err) {
-          alert("雲端同步失敗，已先儲存於您的瀏覽器中！");
-          proposals.unshift(newProposal);
-          localStorage.setItem(PROPOSALS_LOCAL_KEY, JSON.stringify(proposals));
-          renderProposals();
+          console.error("Firebase 寫入失敗：", err);
+          updateSyncBadge("local", "⚠️ Firebase 寫入被拒（已先顯示於網頁中）");
+          alert(
+            "提案已顯示在您的網頁上，但無法寫入 Firebase 雲端資料庫！\n\n" +
+            "原因：" + err.message + "\n\n" +
+            "解決方式：請打開 Firebase 控制台 -> Realtime Database -> 點選上方的「規則 (Rules)」頁簽，將內容改為：\n" +
+            "{\n  \"rules\": {\n    \".read\": true,\n    \".write\": true\n  }\n}\n並按下「發布 (Publish)」即可！"
+          );
         }
-      } else {
-        proposals.unshift(newProposal);
-        localStorage.setItem(PROPOSALS_LOCAL_KEY, JSON.stringify(proposals));
-        renderProposals();
       }
 
       document.getElementById("propItem").value = "";
@@ -987,6 +1100,9 @@
         buttons[idx].classList.toggle("active", t === tabName);
         document.getElementById(`tab-${t}`).classList.toggle("active", t === tabName);
       });
+      if (tabName === "info") {
+        requestAnimationFrame(adjustPhotoRotation);
+      }
       if (tabName === "market") {
         fetchProposals();
       }
